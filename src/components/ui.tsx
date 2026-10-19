@@ -140,6 +140,19 @@ function parseNum(s: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+const isNumChar = (c: string) => /[0-9.\-]/.test(c);
+
+/** Re-insert thousands separators into what the user is typing, keeping any decimal part as typed. */
+function regroup(s: string): string {
+  const clean = s.replace(/[^0-9.\-]/g, '');
+  const neg = clean.startsWith('-') ? '-' : '';
+  const body = clean.replace(/-/g, '');
+  const dot = body.indexOf('.');
+  const int = dot < 0 ? body : body.slice(0, dot);
+  const frac = dot < 0 ? '' : '.' + body.slice(dot + 1).replace(/\./g, '');
+  return neg + int.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + frac;
+}
+
 export function NumberField(props: {
   label: string;
   value: number;
@@ -191,7 +204,17 @@ export function NumberField(props: {
             setText(props.value ? fmt.format(props.value) : '');
           }}
           onInput={(e) => {
-            const t = (e.currentTarget as HTMLInputElement).value;
+            const el = e.currentTarget as HTMLInputElement;
+            const raw = el.value;
+            const t = regroup(raw);
+            if (t !== raw) {
+              // Keep the caret after the same digit it followed before regrouping
+              const before = [...raw.slice(0, el.selectionStart ?? raw.length)].filter(isNumChar).length;
+              let pos = 0;
+              for (let seen = 0; pos < t.length && seen < before; pos++) if (isNumChar(t[pos])) seen++;
+              el.value = t;
+              el.setSelectionRange(pos, pos);
+            }
             setText(t);
             props.onChange(clampv(parseNum(t)));
           }}
