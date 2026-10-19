@@ -48,7 +48,7 @@ export function salaryPage(gross: number): PageOut {
     { label: 'Single', patch: {} },
     { label: 'Single parent', patch: { family: 'singleParent' as const } },
     { label: 'Married, one income', patch: { family: 'marriedOne' as const } },
-    { label: 'Married, two incomes (spouse earns the same)', patch: { family: 'marriedTwo' as const, spouseIncome: gross } },
+    { label: 'Married, two incomes (spouse earns the same)', patch: { family: 'marriedTwo' as const, spouse: { ...DEFAULT_INPUTS.spouse, salary: gross } } },
   ];
 
   const faq: QA[] = [
