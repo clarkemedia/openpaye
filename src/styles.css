@@ -2590,3 +2590,100 @@ code {
     padding: 20px;
   }
 }
+
+/* Pension relief notice */
+.pension-alert {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: var(--shape-lg);
+  background: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.pension-alert .icon {
+  margin-top: 1px;
+}
+
+/* Sticky take-home bar on phones and tablets */
+.sticky-result {
+  position: fixed;
+  z-index: 30;
+  left: max(12px, env(safe-area-inset-left, 0px));
+  right: max(12px, env(safe-area-inset-right, 0px));
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 10px 20px;
+  border: 0;
+  border-radius: var(--shape-full);
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  box-shadow: var(--elev-3);
+  text-align: left;
+  cursor: pointer;
+  transform: translateY(160%);
+  transition: transform var(--dur-default) var(--spring-default);
+}
+.sticky-result.show {
+  transform: none;
+}
+.sticky-result-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  line-height: 1.15;
+}
+.sticky-result-label {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+.sticky-result-value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.sticky-result-value small {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.sticky-result-meta {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--shape-full);
+  background: color-mix(in srgb, var(--md-surface-container-lowest) 55%, transparent);
+}
+.sticky-result-arrow {
+  transform: rotate(180deg);
+}
+@media (min-width: 1000px) {
+  .sticky-result {
+    display: none;
+  }
+}
+@media print {
+  .sticky-result {
+    display: none !important;
+  }
+}
+
+#result {
+  scroll-margin-top: 130px;
+}
+@media (min-width: 721px) {
+  #result {
+    scroll-margin-top: 84px;
+  }
+}
+@media (max-width: 999px) {
+  .layout {
+    padding-bottom: 104px;
+  }
+}

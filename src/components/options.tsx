@@ -1,7 +1,7 @@
-import type { Inputs, Period } from '../tax/engine';
+import type { Inputs, Period, Result } from '../tax/engine';
 import { YEARS } from '../tax/years';
 import { eurWhole, PERIOD_LABELS, pct } from '../lib/format';
-import { Button, ButtonGroup, Expander, IconButton, NumberField, SelectField, Switch } from './ui';
+import { Button, ButtonGroup, Expander, Icon, IconButton, NumberField, SelectField, Switch } from './ui';
 import { pensionLimitPct } from '../tax/engine';
 
 type Set = (patch: Partial<Inputs>) => void;
@@ -53,8 +53,10 @@ export function SalaryCard({ inputs, set }: { inputs: Inputs; set: Set }) {
   );
 }
 
-export function OptionsPanel({ inputs, set }: { inputs: Inputs; set: Set }) {
+export function OptionsPanel({ inputs, set, r }: { inputs: Inputs; set: Set; r: Result }) {
   const cfg = YEARS[inputs.year];
+  const overLimit = Math.max(0, r.pensionRequested - r.pensionLimit);
+  const capped = !!inputs.pension.capToRelief && overLimit > 0.5;
   const married = inputs.family === 'marriedOne' || inputs.family === 'marriedTwo';
 
   const householdCount =
@@ -145,8 +147,8 @@ export function OptionsPanel({ inputs, set }: { inputs: Inputs; set: Set }) {
         summary={
           inputs.pension.value > 0
             ? inputs.pension.type === 'percent'
-              ? `${inputs.pension.value}% of salary`
-              : `${eurWhole(inputs.pension.value)} ${PERIOD_LABELS[inputs.pension.per].per}`
+              ? `${inputs.pension.value}% of salary${capped ? ', capped at relief limit' : overLimit > 0.5 ? `, ${eurWhole(overLimit)} over relief limit` : ''}`
+              : `${eurWhole(inputs.pension.value)} ${PERIOD_LABELS[inputs.pension.per].per}${capped ? ', capped at relief limit' : overLimit > 0.5 ? `, ${eurWhole(overLimit)} over relief limit` : ''}`
             : 'No contributions'
         }
         badge={pensionCount}
@@ -186,6 +188,31 @@ export function OptionsPanel({ inputs, set }: { inputs: Inputs; set: Set }) {
             Tax relief at your marginal rate on up to <b>{pct(limitPct, 0)}</b> of earnings (age-based limit), on earnings
             up to {eurWhole(cfg.pension.earningsCap)}. Pension contributions don't reduce USC or PRSI.
           </p>
+          {overLimit > 0.5 && (
+            <div class="pension-alert" role="note">
+              <Icon name="info" size={20} />
+              {capped ? (
+                <span>
+                  Your contribution is capped at <b>{eurWhole(r.pensionLimit)}</b> a year, the most that gets tax relief at your age ({pct(r.pensionLimitPct, 0)} of
+                  earnings up to {eurWhole(cfg.pension.earningsCap)}).
+                </span>
+              ) : (
+                <span>
+                  Tax relief covers <b>{eurWhole(r.pensionLimit)}</b> of your <b>{eurWhole(r.pensionRequested)}</b> a year ({pct(r.pensionLimitPct, 0)} of earnings up
+                  to {eurWhole(cfg.pension.earningsCap)}). The other <b>{eurWhole(overLimit)}</b> still comes out of your pay but gets no tax relief.
+                </span>
+              )}
+            </div>
+          )}
+          {overLimit > 0.5 && (
+            <Switch
+              icon="savings"
+              checked={!!inputs.pension.capToRelief}
+              onChange={(capToRelief) => set({ pension: { ...inputs.pension, capToRelief } })}
+              label="Cap my contribution at the tax relief limit"
+              description={`Only pay in what gets tax relief: ${eurWhole(r.pensionLimit)} a year.`}
+            />
+          )}
           <Switch
             icon="account_balance"
             checked={inputs.autoEnrolment && cfg.autoEnrolment.available}

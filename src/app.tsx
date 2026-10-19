@@ -8,7 +8,7 @@ import { Button, ButtonGroup, Icon, IconButton, Snackbar } from './components/ui
 import { Brand, DonateButton, SiteFooter } from './components/site';
 import { ExploreChips, SupportCard } from './components/support';
 import { OptionsPanel, SalaryCard } from './components/options';
-import { Breakdown, Hero, PeriodTable } from './components/results';
+import { Breakdown, Hero, PeriodTable, StickyResult } from './components/results';
 import { AutoEnrolmentCard, BudgetCompare, CurveCard, HouseholdCard, MissingCredits, NextHundred, TaxFreedom, VsMedian, WhatIf } from './components/insights';
 
 /** Embedded in another page (e.g. an iframe), where printing and page links don't apply */
@@ -163,7 +163,7 @@ export function App() {
             <PeriodTable r={r} inputs={inputs} />
           </div>
           <div class="calc-inputs">
-            <OptionsPanel inputs={inputs} set={set} />
+            <OptionsPanel inputs={inputs} set={set} r={r} />
             <div class="input-actions">
               <Button variant="text" icon="restart_alt" onClick={() => setInputs({ ...DEFAULT_INPUTS, year: inputs.year })}>
                 Start over
@@ -206,6 +206,7 @@ export function App() {
       </main>
 
       {!STANDALONE && <SiteFooter />}
+      <StickyResult r={r} inputs={inputs} display={display} />
       <Snackbar message={snack} />
     </>
   );
