@@ -28,7 +28,8 @@ export interface Inputs {
   homeCarer: boolean;
   age: number;
   medicalCard: boolean;
-  pension: { type: AmountType; value: number; per: Period };
+  /** capToRelief: only contribute up to the amount that gets tax relief */
+  pension: { type: AmountType; value: number; per: Period; capToRelief?: boolean };
   autoEnrolment: boolean;
   rent: { enabled: boolean; monthly: number };
   mortgage: { enabled: boolean; interest: number; interest2022: number };
@@ -50,7 +51,7 @@ export const DEFAULT_INPUTS: Inputs = {
   homeCarer: false,
   age: 30,
   medicalCard: false,
-  pension: { type: 'percent', value: 0, per: 'year' },
+  pension: { type: 'percent', value: 0, per: 'year', capToRelief: false },
   autoEnrolment: false,
   rent: { enabled: false, monthly: 1500 },
   mortgage: { enabled: false, interest: 0, interest2022: 0 },
@@ -93,6 +94,8 @@ export interface Result {
   bik: number;
   // Pension
   pensionContribution: number;
+  /** What the pension setting asks for, before any cap to the relief limit */
+  pensionRequested: number;
   pensionRelieved: number;
   pensionLimit: number;
   pensionLimitPct: number;
@@ -254,12 +257,13 @@ function calculateForBase(inputs: Inputs, baseSalary: number, opts: CoreOptions 
   const totalIncome = gross + bik;
 
   // --- Pension ----------------------------------------------------
-  const pensionContribution =
+  const pensionRequested =
     inputs.pension.type === 'percent'
       ? (base * clamp0(inputs.pension.value)) / 100
       : toAnnual(clamp0(inputs.pension.value), inputs.pension.per, s);
   const limitPct = pensionLimitPct(inputs.age, cfg);
   const pensionLimit = limitPct * Math.min(totalIncome, cfg.pension.earningsCap);
+  const pensionContribution = inputs.pension.capToRelief ? Math.min(pensionRequested, pensionLimit) : pensionRequested;
   const pensionRelieved = Math.min(pensionContribution, pensionLimit);
 
   const taxableIncome = Math.max(0, totalIncome - pensionRelieved);
@@ -452,6 +456,7 @@ function calculateForBase(inputs: Inputs, baseSalary: number, opts: CoreOptions 
     gross,
     bik,
     pensionContribution,
+    pensionRequested,
     pensionRelieved,
     pensionLimit,
     pensionLimitPct: limitPct,
