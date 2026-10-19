@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "strict": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": ["vite/client", "node"],
+    "paths": { "react": ["./node_modules/preact/compat/"], "react-dom": ["./node_modules/preact/compat/"] }
+  },
+  "include": ["src", "scripts", "api", "vite.config.ts", "vite.widget.config.ts"]
+}
