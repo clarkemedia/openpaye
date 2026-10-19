@@ -127,3 +127,19 @@ describe('reliefs', () => {
     expect(run({ amount: 18000, age: 66 }).incomeTax).toBe(0);
   });
 });
+
+describe('cross-check against PwC Ireland Budget 2027 calculator', () => {
+  // PwC results for a single employee on €40,000, full-rate PRSI, no pension
+  it('€40,000 single, 2026 and 2027, matches to the euro', () => {
+    const r26 = run({ year: 2026, amount: 40000 });
+    expect(r26.incomeTax).toBeCloseTo(4000, 0);
+    expect(r26.prsi).toBeCloseTo(1695, 0);
+    expect(r26.usc).toBeCloseTo(733, 0);
+    expect(r26.net).toBeCloseTo(33572, 0);
+    const r27 = run({ year: 2027, amount: 40000 });
+    expect(r27.incomeTax).toBeCloseTo(3750, 0);
+    expect(r27.prsi).toBeCloseTo(1755, 0);
+    expect(r27.usc).toBeCloseTo(717, 0);
+    expect(r27.net).toBeCloseTo(33778, 0);
+  });
+});
