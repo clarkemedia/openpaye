@@ -95,6 +95,20 @@ describe('reliefs', () => {
     expect(a.incomeTax - b.incomeTax).toBeCloseTo(3000 * 0.4, 2);
   });
 
+  it('relief is capped at the age % of earnings up to €115,000', () => {
+    const r = run({ amount: 150000, age: 30, pension: { type: 'percent', value: 20, per: 'year' } });
+    expect(r.pensionContribution).toBe(30000);
+    expect(r.pensionLimit).toBe(23000);
+    expect(r.pensionRelieved).toBe(23000);
+  });
+
+  it('capToRelief limits the contribution itself to the relief maximum', () => {
+    const r = run({ amount: 150000, age: 30, pension: { type: 'percent', value: 20, per: 'year', capToRelief: true } });
+    expect(r.pensionRequested).toBe(30000);
+    expect(r.pensionContribution).toBe(23000);
+    expect(r.pensionRelieved).toBe(23000);
+  });
+
   it('pension relief capped by age band', () => {
     const r = run({ amount: 50000, age: 25, pension: { type: 'percent', value: 30, per: 'year' } });
     expect(r.pensionRelieved).toBeCloseTo(7500, 2);

@@ -1,6 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { fromAnnual, type Inputs, type Period, type Result } from '../tax/engine';
 import { eur, eurCents, eurWhole, PERIOD_LABELS, pct } from '../lib/format';
+import { useEffect, useState } from 'preact/hooks';
 import { ButtonGroup, Icon, Shape, Tip, useAnimatedNumber, type ShapeName } from './ui';
 import { SplitBar, type Segment } from './charts';
 
@@ -43,7 +44,7 @@ export function Hero(props: {
   const [euros, cents] = eurCents(anim).split('.');
 
   return (
-    <section class="card hero" aria-live="polite" aria-label="Your take-home pay">
+    <section class="card hero" id="result" aria-live="polite" aria-label="Your take-home pay">
       <div class="hero-shapes" aria-hidden="true">
         <Shape name={YEAR_SHAPES[inputs.year]} class="hero-shape a" />
         <Shape name={inputs.year === 2027 ? 'cookie12' : 'clover'} class="hero-shape b" />
@@ -277,5 +278,39 @@ export function Breakdown({ r }: { r: Result }) {
         <Line strong label="Take-home pay" value={eurCents(r.net)} />
       </div>
     </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Sticky take-home bar (phones): visible whenever the hero is off screen */
+/* ------------------------------------------------------------------ */
+
+export function StickyResult({ r, inputs, display }: { r: Result; inputs: Inputs; display: Period }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const el = document.getElementById('result');
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setShow(!e.isIntersecting), { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const net = fromAnnual(r.net, display, inputs.schedule);
+  return (
+    <button
+      type="button"
+      class={`sticky-result ${show ? 'show' : ''}`}
+      aria-hidden={!show}
+      tabIndex={show ? 0 : -1}
+      onClick={() => document.getElementById('result')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+    >
+      <span class="sticky-result-text">
+        <span class="sticky-result-label">Take-home</span>
+        <span class="sticky-result-value">
+          {eur(net, display !== 'year')} <small>{PERIOD_LABELS[display].per}</small>
+        </span>
+      </span>
+      <span class="sticky-result-meta">tax {pct(r.effectiveRate, 0)}</span>
+      <Icon name="keyboard_arrow_down" class="sticky-result-arrow" />
+    </button>
   );
 }
