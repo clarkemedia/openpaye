@@ -24,6 +24,7 @@ jobs:
       - run: npm run build
         env:
           VITE_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          VITE_DONATE_URL: https://www.paypal.com/paypalme/eoinmcm
       - name: Publish dist/ to the gh-pages branch
         run: |
           cd dist

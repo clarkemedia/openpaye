@@ -47,6 +47,7 @@ import calculate from '@material-symbols/svg-500/rounded/calculate.svg?raw';
 import showChart from '@material-symbols/svg-500/rounded/show_chart.svg?raw';
 import balance from '@material-symbols/svg-500/rounded/balance.svg?raw';
 import shieldLock from '@material-symbols/svg-500/rounded/shield_lock.svg?raw';
+import coffee from '@material-symbols/svg-500/rounded/coffee.svg?raw';
 import celebration from '@material-symbols/svg-500/rounded/celebration.svg?raw';
 import person from '@material-symbols/svg-500/rounded/person.svg?raw';
 import favorite from '@material-symbols/svg-500/rounded/favorite.svg?raw';
@@ -113,6 +114,7 @@ const RAW = {
   shield_lock: shieldLock,
   person: person,
   celebration: celebration,
+  coffee: coffee,
   favorite: favorite,
   handshake: handshake,
   workspace_premium: workspacePremium,
