@@ -427,3 +427,41 @@ export function Tip({ children }: { children: ComponentChildren }) {
     </span>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Slider (M3 Expressive: thick track, bar handle)                    */
+/* ------------------------------------------------------------------ */
+
+export function Slider(props: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  onChange: (n: number) => void;
+  format?: (n: number) => string;
+  hint?: ComponentChildren;
+}) {
+  const id = useId();
+  const p = ((props.value - props.min) / Math.max(1e-9, props.max - props.min)) * 100;
+  return (
+    <div class="slider-field">
+      <div class="slider-head">
+        <label for={id}>{props.label}</label>
+        <span class="slider-value">{props.format ? props.format(props.value) : props.value}</span>
+      </div>
+      <input
+        id={id}
+        type="range"
+        class="slider"
+        min={props.min}
+        max={props.max}
+        step={props.step ?? 1}
+        value={props.value}
+        style={{ '--p': `${p}%` } as JSX.CSSProperties}
+        onInput={(e) => props.onChange(Number((e.currentTarget as HTMLInputElement).value))}
+      />
+      {props.hint && <div class="field-hint">{props.hint}</div>}
+    </div>
+  );
+}

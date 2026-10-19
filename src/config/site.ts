@@ -7,11 +7,14 @@
  *   VITE_DONATE_URL=https://paypal.me/you       Optional support link (PayPal, Ko-fi, GitHub Sponsors…)
  *   VITE_SITE_PAGES=1                           Set by the `web` branch, which adds the guide and salary pages
  */
+import pkg from '../../package.json';
+
 const env = (import.meta as any).env ?? {};
 const clean = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim().replace(/\/$/, '') : undefined);
 
 export const SITE = {
   name: 'OpenPAYE',
+  version: (pkg as { version: string }).version,
   domain: 'openpaye.ie',
   url: clean(env.VITE_SITE_URL) ?? 'https://openpaye.ie',
   repoUrl: clean(env.VITE_REPO_URL) ?? 'https://github.com/clarkemedia/openpaye',

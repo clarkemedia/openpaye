@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { calculate, DEFAULT_INPUTS, type Inputs, type Period } from './tax/engine';
+import { calculate, calculateForSalary, DEFAULT_INPUTS, type Inputs, type Period } from './tax/engine';
 import { YEAR_LIST, YEARS, type TaxYear } from './tax/years';
 import { applyTheme, SEEDS, type SeedId, type ThemeMode } from './lib/theme';
 import { decodeInputs, encodeInputs, loadPref, savePref, shareUrl } from './lib/state';
 import { eurWhole } from './lib/format';
 import { Button, ButtonGroup, Icon, IconButton, Snackbar } from './components/ui';
 import { Brand, DonateButton, SiteFooter } from './components/site';
-import { ExploreChips, SupportCard } from './components/support';
+import { ExploreChips } from './components/support';
 import { OptionsPanel, SalaryCard } from './components/options';
-import { Breakdown, Hero, PeriodTable, StickyResult } from './components/results';
-import { AutoEnrolmentCard, BudgetCompare, CurveCard, HouseholdCard, MissingCredits, NextHundred, TaxFreedom, VsMedian, WhatIf } from './components/insights';
+import { Breakdown, Hero, PeriodTable, StickyResult, type HeroView } from './components/results';
+import { AutoEnrolmentCard, BonusCard, BudgetCompare, CurveCard, HouseholdCard, MissingCredits, NextHundred, SharesCard, TaxFreedom, VsMedian, WhatIf } from './components/insights';
 
 /** Embedded in another page (e.g. an iframe), where printing and page links don't apply */
 const FRAMED = (() => {
@@ -38,6 +38,16 @@ export function App() {
 
   const set = (patch: Partial<Inputs>) => setInputs((prev) => ({ ...prev, ...patch }));
   const r = useMemo(() => calculate(inputs), [inputs]);
+  const [view, setView] = useState<HeroView>('you');
+  // Bonus planner: regular pay without the bonus, so the bonus can be shown as its own lump sum
+  const regular = useMemo(
+    () =>
+      inputs.bonusPlan.separate && r.bonus > 0
+        ? calculateForSalary({ ...inputs, bonus: { ...inputs.bonus, value: 0 }, bonusPlan: { ...inputs.bonusPlan, toPensionPct: 0 } }, r.baseSalary)
+        : null,
+    [inputs, r.baseSalary, r.bonus],
+  );
+  const shown = regular ?? r;
 
   useEffect(() => applyTheme(seed, mode), [seed, mode]);
   useEffect(() => savePref('display', display), [display]);
@@ -159,8 +169,8 @@ export function App() {
             <SalaryCard inputs={inputs} set={set} />
           </div>
           <div class="calc-results">
-            <Hero r={r} inputs={inputs} display={display} setDisplay={setDisplay} />
-            <PeriodTable r={r} inputs={inputs} />
+            <Hero r={r} regular={regular} inputs={inputs} set={set} display={display} setDisplay={setDisplay} view={view} setView={setView} />
+            <PeriodTable r={shown} inputs={inputs} bonusNet={regular ? r.net - regular.net : 0} />
           </div>
           <div class="calc-inputs">
             <OptionsPanel inputs={inputs} set={set} r={r} />
@@ -192,6 +202,8 @@ export function App() {
           <CurveCard r={r} inputs={inputs} />
           <VsMedian r={r} inputs={inputs} />
           <WhatIf r={r} inputs={inputs} />
+          {r.bonus > 0 && <BonusCard r={r} inputs={inputs} />}
+          {(r.shares.esppContribution > 0 || r.shares.apss > 0 || r.shares.rsu > 0) && <SharesCard r={r} />}
           {r.household && <HouseholdCard r={r} />}
           <AutoEnrolmentCard r={r} />
           <MissingCredits r={r} inputs={inputs} />
@@ -200,13 +212,12 @@ export function App() {
 
         <Breakdown r={r} />
 
-        {!FRAMED && <SupportCard />}
 
         <About />
       </main>
 
       {!STANDALONE && <SiteFooter />}
-      <StickyResult r={r} inputs={inputs} display={display} />
+      <StickyResult net={shown.net} effectiveRate={shown.effectiveRate} inputs={inputs} display={display} set={set} />
       <Snackbar message={snack} />
     </>
   );
