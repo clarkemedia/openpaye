@@ -258,7 +258,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Is my data stored anywhere?',
-    a: 'No. All calculations run in your browser. Your inputs are saved only on your device and in the page address, so you can bookmark or share a calculation.',
+    a: 'No. OpenPAYE has no cookies, no analytics and no trackers, and it never sends what you type anywhere. Every calculation runs in your browser. Your inputs are kept only on your own device and in the part of the page address after the #, which browsers never send to a server, so you can bookmark or share a calculation privately.',
   },
   {
     q: 'Can I host this myself?',
