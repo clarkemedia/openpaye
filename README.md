@@ -68,6 +68,8 @@ docker compose up -d   # http://localhost:8080
 
 The image runs the tests, builds the app and serves it with nginx. It uses a strict Content Security Policy and makes no external requests.
 
+**GitHub Pages.** Every push to `main` builds the app and publishes it to the `gh-pages` branch (see `.github/workflows/pages.yml`). In a fork, turn it on under **Settings → Pages → Deploy from a branch → `gh-pages` / root**. The live copy is at https://clarkemedia.github.io/openpaye/.
+
 **Any static host.** Upload `dist/` to Netlify, Cloudflare Pages, GitHub Pages, S3 or a plain web server. If your host sets a CSP, allow `/embed.html` to be framed by other sites (`frame-ancestors *`), as `nginx.conf` does.
 
 **No server at all.** Run `npm run build:single`, then open or share `dist-single/index.html`. It works offline.
