@@ -82,7 +82,7 @@ Copy `.env.example` to `.env`, or pass these as Docker build arguments:
 |---|---|
 | `VITE_SITE_URL` | Your site's address (used for canonical links on the `web` branch) |
 | `VITE_REPO_URL` | Shows a "Source code" link in the footer |
-| `VITE_DONATE_URL` | Shows a small "Support" link (PayPal.me, Ko-fi, GitHub Sponsors…) |
+| `VITE_DONATE_URL` | Shows a "Buy me a coffee" link (PayPal.me, Ko-fi, GitHub Sponsors…) |
 
 ## Widget
 
@@ -133,6 +133,10 @@ Budget 2027 figures are as announced and become law when the Finance Act 2026 pa
 ## Contributing
 
 Issues and pull requests are welcome, especially rate corrections with a link to the source.
+
+## Support
+
+OpenPAYE is free and has no ads. If it helped you, you can [buy me a coffee](https://www.paypal.com/paypalme/eoinmcm) to help keep it that way.
 
 ## Licence
 

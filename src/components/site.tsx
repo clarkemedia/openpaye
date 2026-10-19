@@ -19,9 +19,9 @@ export function Brand({ base = './' }: { base?: string }) {
 export function DonateButton() {
   if (!SITE.donateUrl) return null;
   return (
-    <a class="icon-btn donate-btn" href={SITE.donateUrl} target="_blank" rel="noopener" aria-label="Support OpenPAYE" title="Support OpenPAYE">
+    <a class="icon-btn donate-btn" href={SITE.donateUrl} target="_blank" rel="noopener" aria-label="Buy me a coffee to keep OpenPAYE free" title="Buy me a coffee">
       <span class="state" />
-      <Icon name="favorite" />
+      <Icon name="coffee" />
     </a>
   );
 }
@@ -44,7 +44,7 @@ export function SiteFooter({ base = './' }: { base?: string }) {
           </p>
           {SITE.donateUrl && (
             <a class="footer-support" href={SITE.donateUrl} target="_blank" rel="noopener">
-              <Icon name="favorite" size={18} /> Support OpenPAYE
+              <Icon name="coffee" size={18} /> Buy me a coffee to keep it free
             </a>
           )}
         </div>

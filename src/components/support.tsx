@@ -1,21 +1,24 @@
 import { SITE } from '../config/site';
 import { Button, Icon } from './ui';
 
-/** Optional support link. Hidden unless VITE_DONATE_URL is set. */
+/** "Buy me a coffee" card. Hidden unless VITE_DONATE_URL is set. */
 export function SupportCard() {
   if (!SITE.donateUrl) return null;
   return (
     <section class="card support-card" aria-labelledby="support-h">
       <div class="support-art" aria-hidden="true">
-        <Icon name="favorite" size={32} />
+        <Icon name="coffee" size={32} />
       </div>
       <div class="support-text">
         <h2 id="support-h" class="card-title">Keep OpenPAYE free</h2>
-        <p>No ads, no tracking, and the code is open for anyone. If it helped you, chip in for the hosting and the yearly Budget update.</p>
+        <p>
+          OpenPAYE has no ads, no tracking and no paywall, and it's built and updated every Budget by one person. If it helped you, buy me a coffee and help
+          keep it free for everyone.
+        </p>
       </div>
       <div class="support-actions">
-        <Button variant="filled" icon="favorite" href={SITE.donateUrl}>
-          Support OpenPAYE
+        <Button variant="filled" icon="coffee" href={SITE.donateUrl}>
+          Buy me a coffee
         </Button>
       </div>
     </section>
