@@ -1,0 +1,12 @@
+services:
+  openpaye:
+    build:
+      context: .
+      args:
+        VITE_SITE_URL: ${VITE_SITE_URL:-http://localhost:8080}
+        VITE_REPO_URL: ${VITE_REPO_URL:-https://github.com/clarkemedia/openpaye}
+        VITE_DONATE_URL: ${VITE_DONATE_URL:-}
+    image: openpaye:latest
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
