@@ -75,7 +75,7 @@ export function App() {
         return;
       }
       await navigator.clipboard.writeText(url);
-      toast('Link copied — it opens this exact calculation');
+      toast('Link copied. It opens this exact calculation');
     } catch {
       toast('Copy this page address to share');
     }
@@ -139,7 +139,7 @@ export function App() {
             What you <em>actually</em> take home.
           </h1>
           <p>
-            Ireland's salary after tax calculator — Income Tax, USC and PRSI for {YEAR_LIST.join(', ')}, including Budget 2027. Free, private, and
+            Ireland's salary after tax calculator. Income Tax, USC and PRSI for {YEAR_LIST.join(', ')}, including Budget 2027. Free, private, and
             open source. Nothing you type leaves your device.
           </p>
           {!STANDALONE && <ExploreChips />}
@@ -262,7 +262,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Can I host this myself?',
-    a: 'Yes. OpenPAYE is open source and builds to a handful of static files — no server, database or tracking. Run it with Docker, any static web host, or open the single-file build directly.',
+    a: 'Yes. OpenPAYE is open source and builds to a handful of static files, with no server, database or tracking. Run it with Docker, any static web host, or open the single-file build directly.',
   },
 ];
 

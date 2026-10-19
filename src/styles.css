@@ -359,6 +359,9 @@ select {
   display: inline-flex;
   gap: 2px;
   max-width: 100%;
+  padding: 4px;
+  border-radius: var(--shape-full);
+  background: var(--md-surface-container-highest);
 }
 .btn-group.stretch {
   display: flex;
@@ -374,34 +377,24 @@ select {
   gap: 6px;
   border: 0;
   cursor: pointer;
-  background: var(--md-surface-container-highest);
+  background: transparent;
   color: var(--md-on-surface-variant);
   font-weight: 550;
-  border-radius: var(--shape-sm);
+  border-radius: var(--shape-full);
   transition:
-    border-radius var(--dur-fast) var(--spring-fast),
     background-color var(--dur-effects) var(--ease-effects),
     color var(--dur-effects),
-    flex-grow var(--dur-fast) var(--spring-fast),
-    padding var(--dur-fast) var(--spring-fast);
+    transform var(--dur-fast) var(--spring-fast);
   white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
-}
-.seg:first-child {
-  border-top-left-radius: var(--shape-full);
-  border-bottom-left-radius: var(--shape-full);
-}
-.seg:last-child {
-  border-top-right-radius: var(--shape-full);
-  border-bottom-right-radius: var(--shape-full);
 }
 .seg.selected {
   background: var(--md-secondary-container);
   color: var(--md-on-secondary-container);
-  border-radius: var(--shape-full);
+  box-shadow: var(--elev-1);
 }
-.seg:active:not(.selected) {
-  border-radius: var(--shape-xs);
+.seg:active {
+  transform: scale(0.96);
 }
 .seg-check {
   animation: check-in var(--dur-fast) var(--spring-fast);
@@ -413,17 +406,17 @@ select {
   }
 }
 .btn-group-sm .seg {
-  height: 36px;
+  height: 32px;
   padding: 0 14px;
   font-size: 14px;
 }
 .btn-group-md .seg {
-  height: 44px;
+  height: 40px;
   padding: 0 18px;
   font-size: 15px;
 }
 .btn-group-lg .seg {
-  height: 56px;
+  height: 52px;
   padding: 0 24px;
   font-size: 16px;
 }
@@ -582,8 +575,6 @@ select {
 .period-group {
   overflow-x: auto;
   scrollbar-width: none;
-  margin: 0 -4px;
-  padding: 0 4px;
 }
 .period-group::-webkit-scrollbar {
   display: none;
@@ -1106,8 +1097,10 @@ select {
   font-weight: 600;
   font-size: 14px;
 }
-.hero .btn-group .seg {
+.hero .btn-group {
   background: color-mix(in srgb, var(--md-surface-container-lowest) 55%, transparent);
+}
+.hero .btn-group .seg {
   color: var(--md-on-primary-container);
 }
 .hero .btn-group .seg.selected {

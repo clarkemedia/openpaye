@@ -72,7 +72,7 @@ export function BudgetCompare({ inputs, r }: { inputs: Inputs; r: Result }) {
       <p class="note">{YEARS[2027].note}</p>
       {y27.prsi > y26.prsi && (
         <p class="note">
-          PRSI keeps rising each October under the Social Welfare Act — that's{' '}
+          PRSI keeps rising each October under the Social Welfare Act. That's{' '}
           <b>{eurWhole(y27.prsi - y26.prsi)}</b> more PRSI for you in 2027.
         </p>
       )}
@@ -108,7 +108,7 @@ export function NextHundred({ r }: { r: Result }) {
       />
       <p class="note">
         {r.taxableIncome > r.band
-          ? `You're in the 40% band — €${eurWhole(r.taxableIncome - r.band).slice(1)} of your income is taxed at the higher rate.`
+          ? `You're in the 40% band. €${eurWhole(r.taxableIncome - r.band).slice(1)} of your income is taxed at the higher rate.`
           : `You're €${eurWhole(r.band - r.taxableIncome).slice(1)} below the 40% band.`}
       </p>
     </section>
@@ -208,7 +208,7 @@ export function CurveCard({ r, inputs }: { r: Result; inputs: Inputs }) {
         <h2 id="cc-h" class="card-title">
           <Icon name="show_chart" /> Take-home across every salary
         </h2>
-        <span class="card-sub">The gap between the lines is tax. Hover to explore — your options are applied throughout.</span>
+        <span class="card-sub">The gap between the lines is tax. Hover to explore. Your options are applied throughout.</span>
       </div>
       <TakeHomeCurve points={points} you={{ gross: r.gross, net: r.net, rate: r.effectiveRate }} />
     </section>
@@ -247,7 +247,7 @@ export function WhatIf({ r, inputs }: { r: Result; inputs: Inputs }) {
           <div class="whatif-result">
             <span class="whatif-big">{signedEur(raiseGain)}</span>
             <span>
-              a year in your pocket — {signedEur(raiseGain / 12)} a month. You keep {raise > 0 ? pct(raiseGain / raise, 0) : '—'} of the rise.
+              a year in your pocket, or {signedEur(raiseGain / 12)} a month. You keep {raise > 0 ? pct(raiseGain / raise, 0) : '—'} of the rise.
             </span>
           </div>
         </div>
@@ -305,7 +305,7 @@ export function AutoEnrolmentCard({ r }: { r: Result }) {
         </p>
       )}
       <p class="note">
-        Every €1 you put in becomes €{(total / Math.max(ae.employee, 0.01)).toFixed(2)} in your pot. Contribution rates step up every three years — to 6% each from you and your employer by year 10.
+        Every €1 you put in becomes €{(total / Math.max(ae.employee, 0.01)).toFixed(2)} in your pot. Contribution rates step up every three years, reaching 6% each from you and your employer by year 10.
       </p>
     </section>
   );
@@ -319,9 +319,9 @@ export function MissingCredits({ r, inputs }: { r: Result; inputs: Inputs }) {
   const c = r.config.credits;
   const items: { icon: Parameters<typeof Icon>[0]['name']; title: string; body: string }[] = [];
   if (!inputs.rent.enabled)
-    items.push({ icon: 'apartment', title: `Rent Tax Credit — up to ${eurWhole(c.rentSingle)}`, body: 'Renting privately, or paying rent for a student child? Claim it in myAccount, even for past years.' });
+    items.push({ icon: 'apartment', title: `Rent Tax Credit: up to ${eurWhole(c.rentSingle)}`, body: 'Renting privately, or paying rent for a student child? Claim it in myAccount, even for past years.' });
   items.push({ icon: 'work', title: 'Flat-rate expenses', body: 'Nurses, teachers, retail, construction and hundreds of other jobs get an automatic deduction for work costs.' });
-  items.push({ icon: 'medical_services', title: 'Medical expenses — 20% back', body: 'GP visits, prescriptions, physio and more. Claim through myAccount up to four years back.' });
+  items.push({ icon: 'medical_services', title: 'Medical expenses: 20% back', body: 'GP visits, prescriptions, physio and more. Claim through myAccount up to four years back.' });
   items.push({ icon: 'home', title: 'Remote working relief', body: '30% of heat, electricity and broadband for the days you work from home.' });
   items.push({ icon: 'school', title: 'Tuition fees', body: '20% relief on qualifying third-level fees, for you or someone you pay for.' });
   return (
