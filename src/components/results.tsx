@@ -68,7 +68,7 @@ export function Hero(props: {
         <span class="hero-per">{PERIOD_LABELS[display].per}</span>
       </div>
       <p class="hero-sub">
-        from <b>{eur(grossP, display !== 'year')}</b> gross{inputs.reverse && ' (solved from your take-home)'} — you keep{' '}
+        from <b>{eur(grossP, display !== 'year')}</b> gross{inputs.reverse && ' (solved from your take-home)'}. You keep{' '}
         <b>{Math.round(keepPerEuro * 100)}c</b> of every euro.
       </p>
       <div class="hero-chips">
@@ -181,7 +181,7 @@ export function Breakdown({ r }: { r: Result }) {
         <h2 id="bd-h" class="card-title">
           <Icon name="calculate" /> Show me the maths
         </h2>
-        <span class="card-sub">Every step, line by line — exactly how Revenue works it out.</span>
+        <span class="card-sub">Every step, line by line, the way Revenue works it out.</span>
       </div>
 
       <div class="bgroup">
@@ -199,7 +199,7 @@ export function Breakdown({ r }: { r: Result }) {
           />
         )}
         {r.pensionContribution > r.pensionRelieved + 0.005 && (
-          <Line muted sub label="Above your age limit — no tax relief" value={eurCents(r.pensionContribution - r.pensionRelieved)} />
+          <Line muted sub label="Above your age limit, so no tax relief" value={eurCents(r.pensionContribution - r.pensionRelieved)} />
         )}
         <Line strong label="Taxable income" value={eurCents(r.taxableIncome)} />
       </div>
@@ -235,7 +235,7 @@ export function Breakdown({ r }: { r: Result }) {
           <span class="legend-swatch" style={{ background: VIZ.usc }} /> Universal Social Charge
         </h3>
         {r.uscExempt ? (
-          <Line sub label={`Exempt — income of ${eurWhole(cfg.usc.exemptionThreshold)} or less`} value={eurCents(0)} />
+          <Line sub label={`Exempt: income of ${eurWhole(cfg.usc.exemptionThreshold)} or less`} value={eurCents(0)} />
         ) : (
           r.uscLines.map((l) => <Line sub label={`${pct(l.rate)} on ${range(l.from, l.to)}`} value={eurCents(l.amount)} />)
         )}
@@ -250,7 +250,7 @@ export function Breakdown({ r }: { r: Result }) {
         {r.prsiExempt ? (
           <Line
             sub
-            label={r.prsiLines.length === 0 && r.gross + r.bik > cfg.prsi.weeklyExemption * 52 ? 'Exempt — age 66+' : `Exempt — €${cfg.prsi.weeklyExemption} a week or less`}
+            label={r.prsiLines.length === 0 && r.gross + r.bik > cfg.prsi.weeklyExemption * 52 ? 'Exempt: age 66+' : `Exempt: €${cfg.prsi.weeklyExemption} a week or less`}
             value={eurCents(0)}
           />
         ) : (

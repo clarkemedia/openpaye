@@ -119,7 +119,7 @@ export function ButtonGroup<T extends string | number>(props: {
             onClick={() => props.onChange(o.value)}
           >
             <span class="state" />
-            {sel ? <Icon name="check" size={18} class="seg-check" /> : o.icon && <Icon name={o.icon} size={18} />}
+            {o.icon && <Icon name={o.icon} size={18} />}
             <span class="seg-label">{o.label}</span>
             {o.badge && <span class="seg-badge">{o.badge}</span>}
           </button>

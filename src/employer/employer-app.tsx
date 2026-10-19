@@ -84,7 +84,7 @@ export function EmployerApp() {
                 <span class="hero-per">per year</span>
               </div>
               <p class="hero-sub">
-                {eurWhole(r.total / 12)} a month — <b>{pct(r.onCost)}</b> on top of salary.
+                {eurWhole(r.total / 12)} a month, <b>{pct(r.onCost)}</b> on top of salary.
               </p>
               <div class="hero-chips">
                 <span class="stat-chip">
