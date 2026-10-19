@@ -96,6 +96,34 @@ export interface YearConfig {
 
   medicalInsurance: { rate: number; adultCap: number; childCap: number };
 
+  /** Credits, reliefs and other income rules added in v1.1 */
+  extra: {
+    blindSingle: number;
+    blindBoth: number;
+    dependentRelative: number;
+    /** Widowed person / surviving civil partner without dependent children, bereaved before this year */
+    widowed: number;
+    earnedIncome: number;
+    /** Remote working relief: share of utility costs for days worked at home */
+    remoteWorkingRate: number;
+    /** Approved Profit Sharing Scheme: shares free of Income Tax up to this much a year */
+    apssLimit: number;
+    rentARoomLimit: number;
+    /** 3% USC surcharge on non-PAYE income over €100,000 */
+    uscSurcharge: { threshold: number; rate: number };
+    /** Class S / K PRSI applies once self-employed or unearned income passes this */
+    otherIncomePrsiThreshold: number;
+    selfEmployedPrsiMinimum: number;
+    /** Public sector Additional Superannuation Contribution */
+    asc: { exempt: number; fastExempt: number; band2: number; rate1: number; rate2: number; singleRate1: number; singleRate2: number };
+    /** PRSI Class D (public servants recruited before 6 April 1995) */
+    classD: { lowerWeekly: number; firstBand: number; periods: { from: string; share: number; low: number; balance: number }[] };
+    /** Company car OMV reductions */
+    car: { universalReduction: number; evReduction: number; hasA1: boolean };
+    /** Preferential loan specified rates */
+    loanRates: { home: number; other: number };
+  };
+
   context: {
     minimumWageHourly: number;
     /** CSO median annual earnings (latest published, EAADS 2023) */
@@ -190,6 +218,32 @@ const year2025: YearConfig = {
     minEarnings: 20000,
   },
   medicalInsurance: { rate: 0.2, adultCap: 1000, childCap: 500 },
+  extra: {
+    blindSingle: 1950,
+    blindBoth: 3900,
+    dependentRelative: 305,
+    widowed: 2540,
+    remoteWorkingRate: 0.3,
+    apssLimit: 12700,
+    uscSurcharge: { threshold: 100000, rate: 0.03 },
+    otherIncomePrsiThreshold: 5000,
+    selfEmployedPrsiMinimum: 650,
+    asc: { exempt: 34500, fastExempt: 28750, band2: 60000, rate1: 0.1, rate2: 0.105, singleRate1: 0.0333, singleRate2: 0.035 },
+    loanRates: { home: 0.04, other: 0.135 },
+    earnedIncome: 2000,
+    rentARoomLimit: 14000,
+    // 2025 Class D rates derived from the 2026 DSP guide and the October 2025 step (0.1 points)
+    classD: {
+      lowerWeekly: 500,
+      firstBand: 1443,
+      periods: [
+        { from: '1 Jan', share: 0.75, low: 0.01, balance: 0.041 },
+        { from: '1 Oct', share: 0.25, low: 0.011, balance: 0.042 },
+      ],
+    },
+    // 2025: no A1 category; zero-emission cars get the EV reduction on top of the universal one
+    car: { universalReduction: 10000, evReduction: 35000, hasA1: false },
+  },
   context: {
     minimumWageHourly: 13.5,
     medianSalary: MEDIAN,
@@ -235,6 +289,22 @@ const year2026: YearConfig = {
     stateRate: 0.005,
     earningsCap: 80000,
     minEarnings: 20000,
+  },
+  extra: {
+    ...year2025.extra,
+    earnedIncome: 2000,
+    rentARoomLimit: 14000,
+    // From the DSP PRSI Contribution Rates and User Guide, January 2026
+    classD: {
+      lowerWeekly: 500,
+      firstBand: 1443,
+      periods: [
+        { from: '1 Jan', share: 0.75, low: 0.011, balance: 0.042 },
+        { from: '1 Oct', share: 0.25, low: 0.0125, balance: 0.0435 },
+      ],
+    },
+    // A1 (zero emission) category introduced 1 January 2026
+    car: { universalReduction: 10000, evReduction: 20000, hasA1: true },
   },
   context: { ...year2025.context, minimumWageHourly: 14.15 },
 };
@@ -287,6 +357,23 @@ const year2027: YearConfig = {
       { from: '1 Jan', share: 0.75, low: 0.0915, high: 0.114 },
       { from: '1 Oct', share: 0.25, low: 0.093, high: 0.1155 },
     ],
+  },
+  extra: {
+    ...year2026.extra,
+    earnedIncome: 2125,
+    // Budget 2027: rent-a-room limit up from €14,000
+    rentARoomLimit: 16000,
+    // October 2027 step derived from the legislated 0.15 point increase
+    classD: {
+      lowerWeekly: 500,
+      firstBand: 1443,
+      periods: [
+        { from: '1 Jan', share: 0.75, low: 0.0125, balance: 0.0435 },
+        { from: '1 Oct', share: 0.25, low: 0.014, balance: 0.045 },
+      ],
+    },
+    // OMV reductions taper in 2027
+    car: { universalReduction: 5000, evReduction: 10000, hasA1: true },
   },
   context: { ...year2026.context, minimumWageHourly: 14.94 },
 };

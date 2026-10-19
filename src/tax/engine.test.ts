@@ -78,7 +78,7 @@ describe('family status', () => {
   });
 
   it('two-income couple: combined band = 53,000 + min(lower, 35,000)', () => {
-    const r = run({ year: 2026, amount: 70000, family: 'marriedTwo', spouseIncome: 30000 });
+    const r = run({ year: 2026, amount: 70000, family: 'marriedTwo', spouse: { ...DEFAULT_INPUTS.spouse, salary: 30000 } });
     const h = r.household!;
     // Household income tax with combined band 83,000 on 100,000
     const householdGross = 83000 * 0.2 + 17000 * 0.4 - (4000 + 2000 + 2000);
@@ -155,5 +155,155 @@ describe('cross-check against PwC Ireland Budget 2027 calculator', () => {
     expect(r27.prsi).toBeCloseTo(1755, 0);
     expect(r27.usc).toBeCloseTo(717, 0);
     expect(r27.net).toBeCloseTo(33778, 0);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* v1.1 features, worked by hand                                       */
+/* ------------------------------------------------------------------ */
+
+const base60 = () => run({ year: 2026, amount: 60000, age: 35 });
+
+describe('v1.1: pension and AVC', () => {
+  it('AVC shares the relief limit with the main pension', () => {
+    const r = run({ year: 2026, amount: 60000, age: 35, pension: { type: 'percent', value: 5, per: 'year' }, avc: { type: 'fixed', value: 200, per: 'month' } });
+    expect(r.pensionMain).toBe(3000);
+    expect(r.avc).toBe(2400);
+    expect(base60().incomeTax - r.incomeTax).toBeCloseTo(5400 * 0.4, 2);
+  });
+
+  it('bonus planner: part of the bonus goes into the pension as an AVC', () => {
+    const r = run({ year: 2026, amount: 60000, bonus: { type: 'percent', value: 10, per: 'year' }, bonusPlan: { toPensionPct: 50, separate: false } });
+    expect(r.bonus).toBe(6000);
+    expect(r.bonusToPension).toBe(3000);
+    expect(r.pensionRelieved).toBe(3000);
+  });
+});
+
+describe('v1.1: full household', () => {
+  it("joint assessment uses the spouse's own pension", () => {
+    const r = run({
+      year: 2026,
+      amount: 70000,
+      family: 'marriedTwo',
+      spouse: { ...DEFAULT_INPUTS.spouse, salary: 30000, pension: { type: 'percent', value: 5, per: 'year' } },
+    });
+    // Spouse taxable 28,500 → combined band 53,000 + 28,500 = 81,500 on 98,500
+    const expected = 81500 * 0.2 + 17000 * 0.4 - (4000 + 2000 + 2000);
+    expect(r.incomeTax + r.household!.spouseIncomeTax).toBeCloseTo(expected, 2);
+    expect(r.household!.spousePension).toBe(1500);
+    expect(r.household!.combinedNet).toBeCloseTo(r.net + r.household!.spouseNet, 6);
+  });
+});
+
+describe('v1.1: credits and reliefs', () => {
+  it('widowed person credit and single band', () => {
+    expect(run({ year: 2026, amount: 50000, family: 'widowed' }).incomeTax).toBeCloseTo(11200 - 2540 - 2000, 2);
+  });
+  it('Blind Person and Dependent Relative credits', () => {
+    const r = run({ year: 2026, amount: 50000, blind: { you: true, spouse: false }, dependentRelatives: 2 });
+    expect(r.incomeTax).toBeCloseTo(7200 - 1950 - 610, 2);
+  });
+  it('flat rate expenses reduce income tax at the marginal rate', () => {
+    expect(base60().incomeTax - run({ year: 2026, amount: 60000, age: 35, flatRateExpenses: 500 }).incomeTax).toBeCloseTo(200, 2);
+  });
+  it('remote working relief: 30% of bills for days at home', () => {
+    const r = run({ year: 2026, amount: 60000, age: 35, remote: { enabled: true, bills: 3000, days: 146, allowance: 0 } });
+    expect(r.deductions.find((d) => d.key === 'remote')!.amount).toBeCloseTo(360, 2);
+    expect(base60().incomeTax - r.incomeTax).toBeCloseTo(144, 2);
+  });
+});
+
+describe('v1.1: company shares', () => {
+  it('APSS: no Income Tax up to €12,700, but USC and PRSI apply', () => {
+    const b = base60();
+    const r = run({ year: 2026, amount: 60000, age: 35, shares: { ...DEFAULT_INPUTS.shares, apss: 10000 } });
+    expect(r.incomeTax).toBeCloseTo(b.incomeTax, 2);
+    expect(r.usc - b.usc).toBeCloseTo(300, 2);
+    expect(r.prsi - b.prsi).toBeCloseTo(10000 * 0.042375, 2);
+  });
+  it('ESPP: contribution from net pay, discount taxed as pay', () => {
+    const b = base60();
+    const r = run({ year: 2026, amount: 60000, age: 35, shares: { ...DEFAULT_INPUTS.shares, espp: { type: 'percent', value: 10, per: 'month', discount: 15 } } });
+    expect(r.shares.esppContribution).toBe(6000);
+    expect(r.shares.esppBenefit).toBeCloseTo((6000 * 0.15) / 0.85, 2);
+    expect(r.incomeTax - b.incomeTax).toBeCloseTo(r.shares.esppBenefit * 0.4, 2);
+    expect(r.net).toBeCloseTo(b.net - 6000 - (r.totalTax - b.totalTax), 2);
+  });
+  it('RSUs with sell-to-cover leave cash take-home unchanged', () => {
+    const b = base60();
+    const r = run({ year: 2026, amount: 60000, age: 35, shares: { ...DEFAULT_INPUTS.shares, rsu: 20000, rsuSellToCover: true } });
+    expect(r.shares.rsuTax).toBeCloseTo(r.totalTax - b.totalTax, 2);
+    expect(r.net).toBeCloseTo(b.net, 2);
+  });
+});
+
+describe('v1.1: public sector', () => {
+  it('ASC (standard): 10% between €34,500 and €60,000, relieved for income tax only', () => {
+    const r = run({ year: 2026, amount: 50000, publicSector: { enabled: true, scheme: 'standard', classD: false } });
+    expect(r.asc).toBeCloseTo(1550, 2);
+    expect(7200 - r.incomeTax).toBeCloseTo(1550 * 0.4, 2);
+    expect(r.usc).toBeCloseTo(1032.82, 2);
+  });
+  it('ASC (Single Scheme): 3.33% then 3.5% above €60,000', () => {
+    const r = run({ year: 2026, amount: 70000, publicSector: { enabled: true, scheme: 'single', classD: false } });
+    expect(r.asc).toBeCloseTo(25500 * 0.0333 + 10000 * 0.035, 2);
+  });
+  it('PRSI Class D (pre-1995): 1.10% then 1.25% on the first €1,443 a week', () => {
+    const r = run({ year: 2026, amount: 50000, publicSector: { enabled: true, scheme: 'standard', classD: true } });
+    expect(r.prsi).toBeCloseTo(50000 * (0.75 * 0.011 + 0.25 * 0.0125), 2);
+  });
+});
+
+describe('v1.1: other income', () => {
+  it('self-employed only: Earned Income credit and Class S PRSI', () => {
+    const r = run({ year: 2026, amount: 0, otherIncome: { ...DEFAULT_INPUTS.otherIncome, selfEmployed: 40000 } });
+    expect(r.incomeTax).toBeCloseTo(8000 - 2000 - 2000, 2);
+    expect(r.prsi).toBeCloseTo(40000 * 0.042375, 2);
+    expect(r.net).toBeCloseTo(33572.18, 2);
+  });
+  it('PAYE and Earned Income credits together are capped', () => {
+    const r = run({ year: 2026, amount: 50000, otherIncome: { ...DEFAULT_INPUTS.otherIncome, selfEmployed: 20000 } });
+    expect(r.credits.find((c) => c.key === 'eic')).toBeUndefined();
+  });
+  it('3% USC surcharge on non-PAYE income over €100,000', () => {
+    const r = run({ year: 2026, amount: 0, otherIncome: { ...DEFAULT_INPUTS.otherIncome, selfEmployed: 150000 } });
+    expect(r.uscSurcharge).toBeCloseTo(1500, 2);
+  });
+  it('rental income: Income Tax, USC and PRSI at the marginal rates', () => {
+    const b = run({ year: 2026, amount: 50000 });
+    const r = run({ year: 2026, amount: 50000, otherIncome: { ...DEFAULT_INPUTS.otherIncome, rental: 10000 } });
+    expect(r.net - b.net).toBeCloseTo(10000 - 4000 - 300 - 423.75, 2);
+  });
+  it('rent-a-room is tax-free up to the limit, fully taxable over it', () => {
+    const b = run({ year: 2026, amount: 50000 });
+    expect(run({ year: 2026, amount: 50000, otherIncome: { ...DEFAULT_INPUTS.otherIncome, rentARoom: 12000 } }).net - b.net).toBeCloseTo(12000, 2);
+    expect(run({ year: 2026, amount: 50000, otherIncome: { ...DEFAULT_INPUTS.otherIncome, rentARoom: 15000 } }).incomeTax).toBeGreaterThan(b.incomeTax);
+  });
+  it('State pension: taxable, but no USC or PRSI, and the 65+ exemption applies', () => {
+    const r = run({ year: 2026, amount: 0, age: 70, otherIncome: { ...DEFAULT_INPUTS.otherIncome, statePension: 15000 } });
+    expect(r.incomeTax).toBe(0);
+    expect(r.usc).toBe(0);
+    expect(r.prsi).toBe(0);
+    expect(r.net).toBeCloseTo(15000, 2);
+  });
+});
+
+describe('v1.1: benefits-in-kind', () => {
+  it('company car: (OMV − reduction) × category %', () => {
+    const car = { enabled: true, omv: 40000, category: 'C' as const, businessKm: 10000, contribution: 0 };
+    expect(run({ year: 2026, car }).bikLines.find((l) => l.key === 'car')!.amount).toBeCloseTo(9000, 2);
+    const ev = { ...car, omv: 45000, category: 'A1' as const };
+    expect(run({ year: 2026, car: ev }).bik).toBeCloseTo(2250, 2);
+    expect(run({ year: 2027, car: ev }).bik).toBeCloseTo(4500, 2);
+  });
+  it('preferential loan: difference to the 13.5% specified rate', () => {
+    expect(run({ year: 2026, loan: { enabled: true, amount: 20000, rate: 2, kind: 'other' } }).bik).toBeCloseTo(2300, 2);
+  });
+});
+
+describe('v1.1: payslip mode', () => {
+  it('uses the PRSI rate in force (for a past year, the October rate)', () => {
+    expect(run({ year: 2025, amount: 50000, payslipMode: true }).prsi).toBeCloseTo(50000 * 0.042, 2);
   });
 });

@@ -62,6 +62,14 @@ import northEast from '@material-symbols/svg-500/rounded/north_east.svg?raw';
 import api from '@material-symbols/svg-500/rounded/api.svg?raw';
 import dataObject from '@material-symbols/svg-500/rounded/data_object.svg?raw';
 import menu from '@material-symbols/svg-500/rounded/menu.svg?raw';
+import directionsCar from '@material-symbols/svg-500/rounded/directions_car.svg?raw';
+import badge from '@material-symbols/svg-500/rounded/badge.svg?raw';
+import visibilityOff from '@material-symbols/svg-500/rounded/visibility_off.svg?raw';
+import computer from '@material-symbols/svg-500/rounded/computer.svg?raw';
+import personAdd from '@material-symbols/svg-500/rounded/person_add.svg?raw';
+import stackedLineChart from '@material-symbols/svg-500/rounded/stacked_line_chart.svg?raw';
+import redeem from '@material-symbols/svg-500/rounded/redeem.svg?raw';
+import workHistory from '@material-symbols/svg-500/rounded/work_history.svg?raw';
 
 const RAW = {
   light_mode: lightMode,
@@ -114,6 +122,14 @@ const RAW = {
   shield_lock: shieldLock,
   person: person,
   celebration: celebration,
+  directions_car: directionsCar,
+  badge: badge,
+  visibility_off: visibilityOff,
+  computer: computer,
+  person_add: personAdd,
+  stacked_line_chart: stackedLineChart,
+  redeem: redeem,
+  work_history: workHistory,
   coffee: coffee,
   favorite: favorite,
   handshake: handshake,

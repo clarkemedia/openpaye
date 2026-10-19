@@ -22,15 +22,21 @@
 | **Tax years** | 2025, 2026 and 2027 (Budget 2027, announced 6 October 2026) |
 | **Pay periods** | Year, month, fortnight, week, day and hour, with a custom work schedule |
 | **Reverse mode** | Enter your take-home pay to find the gross salary |
-| **Tax status** | Single, single parent, married with one income (with Home Carer credit), married with two incomes (joint assessment, with a household view) |
-| **Age rules** | Pension relief limits by age, Age credit (65+), the 65+ exemption with marginal relief, no PRSI from 66, reduced USC (70+ or medical card) |
-| **Pension** | Percentage or fixed contributions with age-limited relief; auto-enrolment (My Future Fund) from 2026 |
-| **Extras** | Bonus or commission, up to three overtime rates |
-| **Credits and reliefs** | Rent Tax Credit, Mortgage Interest Tax Credit (2025–26), employer health insurance with medical insurance relief, Incapacitated Child credit, and credits from your own certificate |
-| **Insights** | What each Budget did to your tax, your next €100, tax freedom day, how you compare with the median and minimum wage, take-home at every salary, pay-rise and pension what-ifs, auto-enrolment, household view |
+| **Household** | Single, single parent, widowed, married with one income (Home Carer credit) or two incomes. For two incomes, your partner gets their own salary, bonus, pension, AVCs and benefits, and you can switch the headline between You, Spouse and Household |
+| **Pension** | Percentage or fixed contributions plus AVCs, sharing the age-based relief limit and the €115k earnings cap, with an option to cap at the limit. Auto-enrolment (My Future Fund) from 2026 |
+| **Bonus planner** | Overtime and bonus, a slider to pay part of the bonus into your pension, a cash vs pension comparison, and an option to keep a lump-sum bonus out of your monthly figure |
+| **Company shares** | ESPP, Approved Profit Sharing Scheme (APSS) and RSUs with sell-to-cover |
+| **Benefits-in-kind** | Health insurance with medical insurance relief, company cars (A1 to E, business kilometres, OMV reductions), employer loans and other benefits |
+| **Credits and reliefs** | Rent Tax Credit, Mortgage Interest Tax Credit (2025–26), flat rate expenses, remote working relief, Blind Person, Dependent Relative, Incapacitated Child, Age credit and the 65+ exemption, reduced USC (70+ or medical card), and credits from your certificate |
+| **Public sector** | Additional Superannuation Contribution (pre-2013, fast accrual and Single Scheme) and PRSI Class D |
+| **Other income** | Self-employed profit (Class S PRSI, Earned Income credit, USC surcharge), rental income, rent-a-room relief, investment income and the State pension |
+| **Payslip mode** | Uses the PRSI rate in force now instead of the yearly average |
+| **Insights** | What each Budget did to your tax, your next €100, tax freedom day, how you compare, take-home at every salary, pay-rise and pension what-ifs, bonus planner, shares, auto-enrolment and household |
 | **Transparency** | "Show me the maths" lists every band, credit and rate |
 | **Employer cost** | Employer PRSI, auto-enrolment matching and pension, at `/employer-cost/` |
 | **Sharing** | Your inputs live in the URL, so a link opens the exact calculation |
+
+See [CHANGELOG.md](CHANGELOG.md) for what's new.
 
 ## Run it
 

@@ -45,7 +45,7 @@ export default {
         period,
         reverse,
         family: status,
-        spouseIncome: Number(q.get('spouseIncome') ?? 0),
+        spouse: { ...DEFAULT_INPUTS.spouse, salary: Number(q.get('spouseIncome') ?? 0) },
         age: Number(q.get('age') ?? 30),
         pension: { type: 'percent', value: Number(q.get('pension') ?? 0), per: 'year' },
         autoEnrolment: q.get('autoEnrolment') === '1',
