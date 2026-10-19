@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'preact/hooks';
-import { calculateForSalary, type Inputs, type Result } from '../tax/engine';
+import { calculateForSalary, DEFAULT_INPUTS, type Inputs, type Result } from '../tax/engine';
 import { YEAR_LIST, YEARS } from '../tax/years';
 import { eurWhole, pct, signedEur } from '../lib/format';
 import { CompareBars, SplitBar, TakeHomeCurve, type CurvePoint } from './charts';
@@ -166,7 +166,7 @@ export function VsMedian({ r, inputs }: { r: Result; inputs: Inputs }) {
     { label: 'Average earnings', value: ctx.meanSalary },
     { label: 'You', value: r.gross, highlight: true },
   ].sort((a, b) => a.value - b.value);
-  const medianNet = calculateForSalary({ ...inputs, family: 'single', pension: { ...inputs.pension, value: 0 }, overtime: [], bonus: { ...inputs.bonus, value: 0 }, autoEnrolment: false, health: { ...inputs.health, enabled: false }, rent: { ...inputs.rent, enabled: false }, mortgage: { ...inputs.mortgage, enabled: false }, otherCredits: 0 }, ctx.medianSalary).net;
+  const medianNet = calculateForSalary({ ...DEFAULT_INPUTS, year: inputs.year }, ctx.medianSalary).net;
   return (
     <section class="card insight" aria-labelledby="vm-h">
       <h2 id="vm-h" class="card-title">
@@ -372,6 +372,103 @@ export function HouseholdCard({ r }: { r: Result }) {
         Spouse: income tax {eurWhole(h.spouseIncomeTax)}, USC {eurWhole(h.spouseUsc)}, PRSI {eurWhole(h.spousePrsi)}. Joint assessment lets you share a standard rate band of up to{' '}
         {eurWhole(r.config.incomeTax.bands.marriedOneIncome + r.config.incomeTax.bands.marriedSecondIncomeIncrease)}.
       </p>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Bonus planner                                                       */
+/* ------------------------------------------------------------------ */
+
+export function BonusCard({ r, inputs }: { r: Result; inputs: Inputs }) {
+  const rows = useMemo(() => {
+    const noBonus = calculateForSalary({ ...inputs, bonus: { ...inputs.bonus, value: 0 }, bonusPlan: { ...inputs.bonusPlan, toPensionPct: 0 } }, r.baseSalary);
+    const at = (pctToPension: number) => {
+      const x = calculateForSalary({ ...inputs, bonusPlan: { ...inputs.bonusPlan, toPensionPct: pctToPension } }, r.baseSalary);
+      return {
+        pct: pctToPension,
+        pocket: x.net - noBonus.net,
+        pension: x.bonusToPension,
+        tax: x.totalTax - noBonus.totalTax,
+      };
+    };
+    const current = inputs.bonusPlan.toPensionPct;
+    const list = [at(0), at(100)];
+    if (current > 0 && current < 100) list.splice(1, 0, at(current));
+    return list;
+  }, [inputs, r.baseSalary]);
+
+  const cash = rows[0];
+  const pension = rows[rows.length - 1];
+  return (
+    <section class="card insight span-2" aria-labelledby="bonus-h">
+      <div class="card-head">
+        <h2 id="bonus-h" class="card-title">
+          <Icon name="payments" /> Your {eurWhole(r.bonus)} bonus: cash or pension?
+        </h2>
+        <span class="card-sub">What you'd pocket, what goes into your pension, and what goes in tax.</span>
+      </div>
+      <div class="year-table">
+        <div class="yt-row yt-head">
+          <span>Bonus to pension</span>
+          <span>In your pocket</span>
+          <span>Into pension</span>
+          <span>Tax</span>
+          <span>Total kept</span>
+        </div>
+        {rows.map((x) => (
+          <div class={`yt-row ${x.pct === inputs.bonusPlan.toPensionPct ? 'current' : ''}`}>
+            <span class="yt-year">{x.pct}%</span>
+            <span>{eurWhole(x.pocket)}</span>
+            <span>{eurWhole(x.pension)}</span>
+            <span>{eurWhole(x.tax)}</span>
+            <span class="yt-net">{eurWhole(x.pocket + x.pension)}</span>
+          </div>
+        ))}
+      </div>
+      <p class="note">
+        Taking it all as cash, you keep {eurWhole(cash.pocket)}. Putting it all into your pension keeps {eurWhole(pension.pocket + pension.pension)} for
+        you overall, {eurWhole(pension.pocket + pension.pension - cash.pocket)} more, because pension contributions get income tax relief (within your age limit).
+        USC and PRSI are still charged on the bonus either way. Use the slider under Bonus & overtime to try a split.
+      </p>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Company shares                                                      */
+/* ------------------------------------------------------------------ */
+
+export function SharesCard({ r }: { r: Result }) {
+  const sh = r.shares;
+  const esppTax = sh.esppBenefit * (r.marginal.incomeTax + r.marginal.usc + r.marginal.prsi);
+  const apssCharges = sh.apss * (r.marginal.usc + r.marginal.prsi) + Math.max(0, sh.apss - sh.apssTaxFree) * r.marginal.incomeTax;
+  return (
+    <section class="card insight" aria-labelledby="shares-h">
+      <h2 id="shares-h" class="card-title">
+        <Icon name="show_chart" /> Your company shares
+      </h2>
+      <ul class="facts">
+        {sh.esppContribution > 0 && (
+          <li>
+            <b>ESPP:</b> you pay {eurWhole(sh.esppContribution)} and get shares worth {eurWhole(sh.esppSharesValue)}. About {eurWhole(esppTax)} tax on the discount
+            leaves you {eurWhole(sh.esppSharesValue - sh.esppContribution - esppTax)} ahead.
+          </li>
+        )}
+        {sh.apss > 0 && (
+          <li>
+            <b>APSS:</b> {eurWhole(sh.apss)} in shares, {eurWhole(sh.apssTaxFree)} of it free of Income Tax. About {eurWhole(apssCharges)} in USC and PRSI
+            {sh.apss > sh.apssTaxFree ? ' and tax on the amount over the limit' : ''} comes out of your pay.
+          </li>
+        )}
+        {sh.rsu > 0 && (
+          <li>
+            <b>RSUs:</b> {eurWhole(sh.rsu)} vesting, with {eurWhole(sh.rsuTax)} tax{sh.sellToCover ? ' covered by selling shares' : ' out of your pay'}. You keep shares
+            worth about {eurWhole(sh.rsu - sh.rsuTax)}.
+          </li>
+        )}
+      </ul>
+      <p class="note">Tax figures use your marginal rates. Capital Gains Tax applies separately if you later sell at a profit.</p>
     </section>
   );
 }

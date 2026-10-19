@@ -19,9 +19,10 @@ export function Brand({ base = './' }: { base?: string }) {
 export function DonateButton() {
   if (!SITE.donateUrl) return null;
   return (
-    <a class="icon-btn donate-btn" href={SITE.donateUrl} target="_blank" rel="noopener" aria-label="Buy me a coffee to keep OpenPAYE free" title="Buy me a coffee">
+    <a class="coffee-chip" href={SITE.donateUrl} target="_blank" rel="noopener" title="OpenPAYE is free with no ads. A coffee helps keep it that way.">
       <span class="state" />
-      <Icon name="coffee" />
+      <Icon name="coffee" size={18} />
+      <span class="coffee-label">Buy me a coffee</span>
     </a>
   );
 }
@@ -42,6 +43,7 @@ export function SiteFooter({ base = './' }: { base?: string }) {
             A free, open-source salary calculator for the people of Ireland. Estimates only: your payslip depends on your Revenue tax credit
             certificate. Not affiliated with Revenue or the Government of Ireland.
           </p>
+          <p class="footer-version">Version {SITE.version.replace(/\.0$/, '')}</p>
           {SITE.donateUrl && (
             <a class="footer-support" href={SITE.donateUrl} target="_blank" rel="noopener">
               <Icon name="coffee" size={18} /> Buy me a coffee to keep it free
