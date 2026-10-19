@@ -41,6 +41,8 @@ export function EmployerApp() {
   const total = useAnimatedNumber(r.total);
   const cfg = YEARS[year];
   const statePerEuro = r.total > 0 ? (emp.totalTax + r.prsi) / r.total : 0;
+  // Pension contributions are the employee's money too, so count them as reaching the employee
+  const toEmployee = emp.net + emp.autoEnrolment.employee + r.autoEnrolment + r.pension;
 
   const nextMode: Record<ThemeMode, ThemeMode> = { system: 'light', light: 'dark', dark: 'system' };
   const modeIcon = { system: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' } as const;
@@ -96,8 +98,8 @@ export function EmployerApp() {
                   <span class="stat-chip-value">{eurWhole(emp.net)}</span>
                 </span>
                 <span class="stat-chip">
-                  <span class="stat-chip-label">Of each €1 you spend</span>
-                  <span class="stat-chip-value">€{(emp.net / Math.max(1, r.total)).toFixed(2)} to them</span>
+                  <span class="stat-chip-label">Of each €1 you spend, to them</span>
+                  <span class="stat-chip-value">€{(toEmployee / Math.max(1, r.total)).toFixed(2)}</span>
                 </span>
               </div>
               <SplitBar
@@ -174,7 +176,15 @@ export function EmployerApp() {
                   label="Auto-enrolment matching"
                   description={cfg.autoEnrolment.available ? `You match ${pct(cfg.autoEnrolment.employerRate)} on pay up to ${eurWhole(cfg.autoEnrolment.earningsCap)}.` : 'Starts 1 January 2026.'}
                 />
-                <NumberField label="Employer pension contribution" suffix="% of salary" value={pensionPct} step={1} max={40} onChange={setPensionPct} />
+                <NumberField
+                  label="Employer pension contribution"
+                  suffix="% of salary"
+                  value={pensionPct}
+                  step={1}
+                  max={100}
+                  onChange={setPensionPct}
+                  hint="Employer contributions have no age-based limit. Into a PRSA, anything over 100% of salary is taxed as a benefit-in-kind."
+                />
                 <NumberField label="Taxable benefits (e.g. health insurance)" prefix="€" suffix="per year" value={benefits} step={100} onChange={setBenefits} />
               </div>
             </section>
