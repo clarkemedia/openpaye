@@ -2,7 +2,7 @@
 
 **What you actually take home.** OpenPAYE is an open-source salary after tax calculator for Ireland. It covers Income Tax, USC and PRSI for **2025**, **2026** and **Budget 2027**, and shows every step of the maths.
 
-- **Private:** everything runs in your browser. There are no cookies, no analytics and no third-party requests.
+- **Private:** nothing you type is collected. Everything runs in your browser, with no cookies, no analytics, no trackers and no third-party requests. The included nginx config also turns off visitor logs.
 - **Self-hostable:** it builds to static files. Run it with Docker, on any web host, or as a single HTML file that works offline.
 - **Material 3 Expressive design:** dynamic colour, Google Sans Flex, spring motion and shape morphing. It follows your device's light or dark setting, or you can choose one.
 
