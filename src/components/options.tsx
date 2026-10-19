@@ -88,8 +88,8 @@ export function OptionsPanel({ inputs, set }: { inputs: Inputs; set: Set }) {
             options={[
               { value: 'single', label: 'Single' },
               { value: 'singleParent', label: 'Single parent / guardian' },
-              { value: 'marriedOne', label: 'Married / civil partners — one income' },
-              { value: 'marriedTwo', label: 'Married / civil partners — two incomes' },
+              { value: 'marriedOne', label: 'Married / civil partners, one income' },
+              { value: 'marriedTwo', label: 'Married / civil partners, two incomes' },
             ]}
             hint={bandHint(inputs, cfg)}
           />
@@ -195,7 +195,7 @@ export function OptionsPanel({ inputs, set }: { inputs: Inputs; set: Set }) {
             description={
               cfg.autoEnrolment.available
                 ? `You pay ${pct(cfg.autoEnrolment.employeeRate)}, your employer matches ${pct(cfg.autoEnrolment.employerRate)}, and the State adds ${pct(cfg.autoEnrolment.stateRate)} (on pay up to ${eurWhole(cfg.autoEnrolment.earningsCap)}).`
-                : 'Starts 1 January 2026 — switch the tax year to 2026 or 2027.'
+                : 'Starts 1 January 2026. Switch the tax year to 2026 or 2027.'
             }
           />
         </div>
@@ -307,7 +307,7 @@ export function OptionsPanel({ inputs, set }: { inputs: Inputs; set: Set }) {
             label="Mortgage Interest Tax Credit"
             description={
               cfg.credits.mortgageInterestCap === null
-                ? `Not available in ${cfg.year} — the relief ended after 2026.`
+                ? `Not available in ${cfg.year}. The relief ended after 2026.`
                 : `20% of the increase in interest paid vs 2022, up to ${eurWhole(cfg.credits.mortgageInterestCap)}.`
             }
           />
