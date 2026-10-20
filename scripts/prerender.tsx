@@ -7,6 +7,7 @@ import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import renderToString from 'preact-render-to-string';
 import { SITE } from '../src/config/site';
+import { PRIVACY_META } from '../src/config/csp';
 import { allThemesCss } from '../src/lib/theme';
 import { App, FAQ as HOME_FAQ } from '../src/app';
 import { EmployerApp } from '../src/employer/employer-app';
@@ -32,7 +33,7 @@ const ld = (o: object) => `<script type="application/ld+json">${JSON.stringify(o
 const icons = (base: string) => `<link rel="icon" href="${base}favicon.ico" sizes="48x48" />
 <link rel="icon" href="${base}favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="${base}apple-touch-icon.png" />
-<link rel="manifest" href="${base}site.webmanifest" />`;
+<link rel="manifest" href="${base}manifest.json" />`;
 
 /* Shared assets ---------------------------------------------------- */
 
@@ -65,6 +66,7 @@ setTimeout(function(){l.textContent='Copy'},2000)})});
 function head(o: { path: string; title: string; description: string; base: string; jsonLd: object[]; noindex?: boolean }) {
   const url = abs(o.path.replace(/index\.html$/, ''));
   return `<meta charset="UTF-8" />
+${PRIVACY_META}
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>${esc(o.title)}</title>
 <meta name="description" content="${esc(o.description)}" />
@@ -259,11 +261,11 @@ ${yearFacts(2027)}
 
 if (SITE.repoUrl) {
   const expires = new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+  const body = `Contact: ${SITE.repoUrl}/security/advisories/new\nExpires: ${expires}\nPreferred-Languages: en\nCanonical: ${SITE.url}/.well-known/security.txt\nCanonical: ${SITE.url}/security.txt\n`;
   mkdirSync(join(DIST, '.well-known'), { recursive: true });
-  writeFileSync(
-    join(DIST, '.well-known/security.txt'),
-    `Contact: ${SITE.repoUrl}/security/advisories/new\nExpires: ${expires}\nPreferred-Languages: en\nCanonical: ${SITE.url}/.well-known/security.txt\n`,
-  );
+  writeFileSync(join(DIST, '.well-known/security.txt'), body);
+  // Some hosts (Cloudways) keep /.well-known for their own SSL checks, so also publish the root copy
+  writeFileSync(join(DIST, 'security.txt'), body);
 }
 
 // The share image is only needed by the website build, so it lives here rather than in public/
