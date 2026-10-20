@@ -75,6 +75,8 @@ export interface Inputs {
     rsuSellToCover: boolean;
   };
   flatRateExpenses: number;
+  /** Yearly cost of a TaxSaver commuter ticket bought through salary sacrifice */
+  taxSaver: number;
   remote: { enabled: boolean; bills: number; days: number; allowance: number };
   publicSector: { enabled: boolean; scheme: AscScheme; classD: boolean };
   otherIncome: { selfEmployed: number; rental: number; rentARoom: number; investment: number; statePension: number };
@@ -125,6 +127,7 @@ export const DEFAULT_INPUTS: Inputs = {
     rsuSellToCover: true,
   },
   flatRateExpenses: 0,
+  taxSaver: 0,
   remote: { enabled: false, bills: 2500, days: 100, allowance: 0 },
   publicSector: { enabled: false, scheme: 'standard', classD: false },
   otherIncome: { selfEmployed: 0, rental: 0, rentARoom: 0, investment: 0, statePension: 0 },
@@ -172,6 +175,8 @@ export interface Result {
   bonusToPension: number;
   /** Cash gross pay from employment */
   gross: number;
+  /** Pay given up for a TaxSaver ticket: no Income Tax, USC or PRSI on it */
+  taxSaver: number;
   /** All taxable non-cash benefits (health insurance, car, loan, other) */
   bik: number;
   bikLines: Line[];
@@ -409,6 +414,8 @@ interface Person {
   bonus: number;
   bonusToPension: number;
   gross: number;
+  /** Salary sacrificed for a TaxSaver ticket */
+  sacrifice: number;
   bik: number;
   bikLines: Line[];
   /** ESPP discount + RSUs: Income Tax, USC and PRSI */
@@ -457,6 +464,9 @@ function buildPerson(inputs: Inputs, cfg: YearConfig, base: number, isSpouse: bo
       : toAnnual(clamp0(inputs.bonus.value), inputs.bonus.per, s);
   const bonusToPension = isSpouse ? 0 : (bonus * Math.min(100, clamp0(inputs.bonusPlan.toPensionPct))) / 100;
   const gross = base + overtime + bonus;
+  // A TaxSaver ticket bought through salary sacrifice comes out of pay before any tax
+  const sacrifice = isSpouse ? 0 : Math.min(clamp0(inputs.taxSaver), gross);
+  const pay = gross - sacrifice;
 
   // Benefits-in-kind
   const bikLines: Line[] = [];
@@ -529,7 +539,7 @@ function buildPerson(inputs: Inputs, cfg: YearConfig, base: number, isSpouse: bo
     ? clamp0(sp.avc)
     : (inputs.avc.type === 'percent' ? (base * clamp0(inputs.avc.value)) / 100 : toAnnual(clamp0(inputs.avc.value), inputs.avc.per, s)) + bonusToPension;
   const limitPct = pensionLimitPct(age, cfg);
-  const pensionLimit = limitPct * Math.min(gross + bik + selfEmployed, cfg.pension.earningsCap);
+  const pensionLimit = limitPct * Math.min(pay + bik + selfEmployed, cfg.pension.earningsCap);
   const pensionRequested = pensionMain + avc;
   const capToRelief = !isSpouse && !!inputs.pension.capToRelief;
   const pensionContribution = capToRelief ? Math.min(pensionRequested, pensionLimit) : pensionRequested;
@@ -552,13 +562,13 @@ function buildPerson(inputs: Inputs, cfg: YearConfig, base: number, isSpouse: bo
   const shareIncome = esppBenefit + rsu;
   const taxable = Math.max(
     0,
-    gross + bik + shareIncome + apssTaxable + selfEmployed + rental + rentARoomTaxable + investment + statePension - pensionRelieved - sum(deductions),
+    pay + bik + shareIncome + apssTaxable + selfEmployed + rental + rentARoomTaxable + investment + statePension - pensionRelieved - sum(deductions),
   );
 
   // Auto-enrolment
   const ae = cfg.autoEnrolment;
   const aeOn = ae.available && (isSpouse ? sp.autoEnrolment : inputs.autoEnrolment);
-  const aeBase = Math.min(gross, ae.earningsCap);
+  const aeBase = Math.min(pay, ae.earningsCap);
   const autoEnrolment = {
     employee: aeOn ? aeBase * ae.employeeRate : 0,
     employer: aeOn ? aeBase * ae.employerRate : 0,
@@ -572,6 +582,7 @@ function buildPerson(inputs: Inputs, cfg: YearConfig, base: number, isSpouse: bo
     bonus,
     bonusToPension,
     gross,
+    sacrifice,
     bik,
     bikLines,
     shareIncome,
@@ -594,7 +605,7 @@ function buildPerson(inputs: Inputs, cfg: YearConfig, base: number, isSpouse: bo
     asc,
     deductions,
     taxable,
-    employmentIncome: gross + bik + shareIncome + apssTaxable,
+    employmentIncome: pay + bik + shareIncome + apssTaxable,
     age,
     medicalCard: isSpouse ? sp.medicalCard : inputs.medicalCard,
     autoEnrolment,
@@ -604,7 +615,7 @@ function buildPerson(inputs: Inputs, cfg: YearConfig, base: number, isSpouse: bo
 /** USC and PRSI for one person. */
 function socialCharges(p: Person, inputs: Inputs, cfg: YearConfig, isSpouse: boolean) {
   // USC: everything except the State pension (a social welfare payment)
-  const uscIncome = p.gross + p.bik + p.shareIncome + p.apss + p.selfEmployed + p.unearned;
+  const uscIncome = p.gross - p.sacrifice + p.bik + p.shareIncome + p.apss + p.selfEmployed + p.unearned;
   const uscR = calcUsc(uscIncome, cfg, p.medicalCard || p.age >= 70);
   const nonPaye = p.selfEmployed + p.unearned;
   const surcharge = uscR.exempt ? 0 : Math.max(0, nonPaye - cfg.extra.uscSurcharge.threshold) * cfg.extra.uscSurcharge.rate;
@@ -612,7 +623,7 @@ function socialCharges(p: Person, inputs: Inputs, cfg: YearConfig, isSpouse: boo
   // PRSI on employment income (Class A, or Class D for pre-1995 public servants)
   const exempt = p.age >= 66;
   const classD = !isSpouse && inputs.publicSector.enabled && inputs.publicSector.classD;
-  const employment = p.gross + p.bik + p.shareIncome + p.apss;
+  const employment = p.gross - p.sacrifice + p.bik + p.shareIncome + p.apss;
   const periods = payslipPeriods(cfg.prsi.periods, cfg.year, inputs.payslipMode);
   const prsiR = classD ? calcPrsiClassD(employment, cfg, exempt, inputs.payslipMode) : calcPrsi(employment, cfg, exempt, periods);
 
@@ -808,7 +819,7 @@ function calculateForBase(inputs: Inputs, baseSalary: number, opts: CoreOptions 
 
   const otherIncomeTotal = sum(you.otherIncome);
   const totalDeductions =
-    totalTax + you.pensionContribution + you.autoEnrolment.employee + you.asc + you.esppContribution - (sellToCover ? rsuTax : 0);
+    totalTax + you.sacrifice + you.pensionContribution + you.autoEnrolment.employee + you.asc + you.esppContribution - (sellToCover ? rsuTax : 0);
   const net = you.gross + otherIncomeTotal - totalDeductions;
   const totalIncome = you.gross + you.bik + you.shareIncome + you.apss + otherIncomeTotal;
 
@@ -833,6 +844,7 @@ function calculateForBase(inputs: Inputs, baseSalary: number, opts: CoreOptions 
     bonus: you.bonus,
     bonusToPension: you.bonusToPension,
     gross: you.gross,
+    taxSaver: you.sacrifice,
     bik: you.bik,
     bikLines: you.bikLines,
     shares: {

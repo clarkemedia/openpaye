@@ -307,3 +307,22 @@ describe('v1.1: payslip mode', () => {
     expect(run({ year: 2025, amount: 50000, payslipMode: true }).prsi).toBeCloseTo(50000 * 0.042, 2);
   });
 });
+
+describe('TaxSaver commuter ticket', () => {
+  it('€1,000 ticket on €50,000 in 2026: no Income Tax, USC or PRSI on the sacrificed pay (worked by hand)', () => {
+    const r = run({ year: 2026, amount: 50000, taxSaver: 1000 });
+    // Pay for tax is €49,000: 44,000 @ 20% + 5,000 @ 40% − 4,000
+    expect(r.incomeTax).toBeCloseTo(6800, 2);
+    // 12,012 @ 0.5% + 16,688 @ 2% + 20,300 @ 3%
+    expect(r.usc).toBeCloseTo(1002.82, 2);
+    // 49,000 × (4.2% × 9/12 + 4.35% × 3/12)
+    expect(r.prsi).toBeCloseTo(2076.38, 1);
+    expect(r.gross).toBe(50000);
+    expect(r.taxSaver).toBe(1000);
+    // The ticket costs €527.62 in take-home instead of €1,000
+    expect(r.net).toBeCloseTo(39120.81, 1);
+  });
+  it('cannot sacrifice more than your pay', () => {
+    expect(run({ year: 2026, amount: 500, taxSaver: 1000 }).taxSaver).toBe(500);
+  });
+});

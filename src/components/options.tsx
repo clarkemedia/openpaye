@@ -97,6 +97,7 @@ export function OptionsPanel({ inputs, set, r }: { inputs: Inputs; set: Set; r: 
     (inputs.rent.enabled ? 1 : 0) +
     (inputs.mortgage.enabled && cfg.credits.mortgageInterestCap !== null ? 1 : 0) +
     (inputs.flatRateExpenses > 0 ? 1 : 0) +
+    (inputs.taxSaver > 0 ? 1 : 0) +
     (inputs.remote.enabled ? 1 : 0) +
     (inputs.otherCredits > 0 ? 1 : 0);
   const oi = inputs.otherIncome;
@@ -549,6 +550,15 @@ export function OptionsPanel({ inputs, set, r }: { inputs: Inputs; set: Set; r: 
                 .
               </>
             }
+          />
+          <NumberField
+            label="TaxSaver commuter ticket"
+            prefix="€"
+            suffix="per year"
+            value={inputs.taxSaver}
+            step={50}
+            onChange={(taxSaver) => set({ taxSaver })}
+            hint="A bus, rail or Luas ticket your employer buys out of your pay. You pay no Income Tax, USC or PRSI on that part of your pay."
           />
           <Switch
             icon="computer"

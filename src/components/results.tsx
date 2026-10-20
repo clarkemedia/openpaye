@@ -11,6 +11,7 @@ export const VIZ = {
   usc: 'var(--viz-usc)',
   prsi: 'var(--viz-prsi)',
   pension: 'var(--viz-pension)',
+  ticket: 'var(--md-outline)',
 };
 
 export type HeroView = 'you' | 'spouse' | 'household';
@@ -25,6 +26,7 @@ export function segmentsFor(r: Result): Segment[] {
     { key: 'usc', label: 'USC', value: r.usc, color: VIZ.usc },
     { key: 'prsi', label: 'PRSI', value: r.prsi, color: VIZ.prsi },
     { key: 'pension', label: r.asc || r.shares.esppContribution ? 'Pension & savings' : 'Pension', value: savingsOf(r), color: VIZ.pension },
+    { key: 'taxSaver', label: 'TaxSaver ticket', value: r.taxSaver, color: VIZ.ticket },
   ];
 }
 
@@ -186,6 +188,7 @@ export function PeriodTable({ r, inputs, bonusNet }: { r: Result; inputs: Inputs
   const nonCash = r.bik + r.shares.esppBenefit + r.shares.apss + r.shares.rsu;
   const rows: { label: ComponentChildren; v: number; strong?: boolean; color?: string; neg?: boolean; hide?: boolean }[] = [
     { label: 'Gross pay', v: r.gross, strong: true },
+    { label: 'TaxSaver ticket (before tax)', v: r.taxSaver, color: VIZ.ticket, neg: true, hide: r.taxSaver === 0 },
     { label: 'Other income', v: r.otherIncomeTotal, hide: r.otherIncomeTotal === 0 },
     { label: 'Benefits & shares (taxed, not paid)', v: nonCash, hide: nonCash === 0 },
     { label: 'Income tax', v: r.incomeTax, color: VIZ.incomeTax, neg: true },
@@ -287,6 +290,7 @@ export function Breakdown({ r }: { r: Result }) {
         <Line label="Basic salary" value={eurCents(r.baseSalary)} />
         {r.overtime > 0 && <Line label="Overtime" value={eurCents(r.overtime)} />}
         {r.bonus > 0 && <Line label="Bonus / commission" value={eurCents(r.bonus)} />}
+        {r.taxSaver > 0 && <Line label={withHint('TaxSaver ticket', 'salary sacrifice, no tax on it')} value={`−${eurCents(r.taxSaver)}`} />}
         {r.bikLines.map((l) => (
           <Line label={withHint(`${l.label} (benefit-in-kind)`, l.hint)} value={eurCents(l.amount)} />
         ))}
@@ -380,6 +384,15 @@ export function Breakdown({ r }: { r: Result }) {
           {r.asc > 0 && <Line sub label="Additional Superannuation Contribution" value={eurCents(r.asc)} />}
           {sh.esppContribution > 0 && <Line sub label={`ESPP purchases (shares worth ${eurWhole(sh.esppSharesValue)})`} value={eurCents(sh.esppContribution)} />}
           {sh.sellToCover && <Line sub label="RSU tax paid by selling shares, not from your salary" value={`+${eurCents(sh.rsuTax)}`} />}
+        </div>
+      )}
+
+      {r.taxSaver > 0 && (
+        <div class="bgroup">
+          <h3 class="bgroup-title">
+            <span class="legend-swatch" style={{ background: VIZ.ticket }} /> TaxSaver ticket
+          </h3>
+          <Line sub label="Taken from your pay before tax" value={eurCents(r.taxSaver)} />
         </div>
       )}
 
