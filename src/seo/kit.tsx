@@ -4,7 +4,8 @@
  */
 import type { ComponentChildren } from 'preact';
 import { SITE } from '../config/site';
-import { Brand, SiteFooter } from '../components/site';
+import { Brand, SiteFooter, SiteNav } from '../components/site';
+import { SupportCard } from '../components/support';
 import { Icon } from '../components/ui';
 import type { IconName } from '../components/icon-data';
 
@@ -19,13 +20,7 @@ export function SiteHeader({ base }: { base: string }) {
   return (
     <header class="topbar static">
       <Brand base={base} />
-      <nav class="site-nav" aria-label="Main">
-        <a href={`${base}salary/`}>Salaries</a>
-        <a href={`${base}take-home/`}>Net to gross</a>
-        <a href={`${base}budget-2027/`}>Budget 2027</a>
-        <a href={`${base}employer-cost/`}>Employer cost</a>
-        <a href={`${base}guides/`}>Guides</a>
-      </nav>
+      <SiteNav base={base} />
       <a class="btn btn-filled btn-md has-icon topbar-cta" href={base}>
         <span class="state" />
         <Icon name="calculate" size={20} />
@@ -56,6 +51,7 @@ export function PageShell(props: { base: string; crumbs: Crumb[]; children: Comp
       <main class="layout page">
         <Crumbs items={props.crumbs} base={props.base} />
         {props.children}
+        <SupportCard />
       </main>
       <SiteFooter base={props.base} />
     </>

@@ -27,6 +27,27 @@ export function DonateButton() {
   );
 }
 
+const MENU = [
+  { href: 'salary/', label: 'Salaries' },
+  { href: 'take-home/', label: 'Net to gross' },
+  { href: 'budget-2027/', label: 'Budget 2027' },
+  { href: 'employer-cost/', label: 'Employer cost' },
+  { href: 'guides/', label: 'Guides' },
+] as const;
+
+/** The website's main menu. Only on the website build, where these pages exist. */
+export function SiteNav({ base = './', current }: { base?: string; current?: string }) {
+  return (
+    <nav class="site-nav" aria-label="Main">
+      {MENU.map((m) => (
+        <a href={`${base}${m.href}`} aria-current={current === m.href ? 'page' : undefined}>
+          {m.label}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
 const POPULAR = [25000, 30000, 35000, 40000, 45000, 50000, 60000, 70000, 80000, 100000];
 
 export function SiteFooter({ base = './' }: { base?: string }) {

@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact';
 import type { AmountSetting, Inputs, Period, Result } from '../tax/engine';
 import { YEARS, type YearConfig } from '../tax/years';
 import { eurWhole, PERIOD_LABELS, pct } from '../lib/format';
@@ -23,12 +24,15 @@ const TYPE_OPTIONS = [
   { value: 'fixed' as const, label: 'Fixed amount', icon: 'euro' as const },
 ];
 
-export function SalaryCard({ inputs, set }: { inputs: Inputs; set: Set }) {
+export function SalaryCard({ inputs, set, aside }: { inputs: Inputs; set: Set; aside?: ComponentChildren }) {
   return (
     <section class="card salary-card" aria-labelledby="salary-h">
-      <h2 id="salary-h" class="card-title">
-        {inputs.reverse ? 'Your take-home pay' : 'Your gross salary'}
-      </h2>
+      <div class="salary-head">
+        <h2 id="salary-h" class="card-title">
+          {inputs.reverse ? 'Your take-home pay' : 'Your gross salary'}
+        </h2>
+        {aside}
+      </div>
       <NumberField
         size="xl"
         label={inputs.reverse ? 'Take-home amount' : 'Salary before tax'}

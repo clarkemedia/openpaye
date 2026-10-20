@@ -10,10 +10,10 @@ export function SupportCard() {
         <Icon name="coffee" size={32} />
       </div>
       <div class="support-text">
-        <h2 id="support-h" class="card-title">Keep OpenPAYE free</h2>
+        <h2 id="support-h" class="card-title">Keeping OpenPAYE free</h2>
         <p>
-          OpenPAYE has no ads, no tracking and no paywall, and it's built and updated every Budget by one person. If it helped you, buy me a coffee and help
-          keep it free for everyone.
+          No ads, no tracking, no sign-up. This is a passion project! However, hosting and upkeep cost money, so if this helped you, please consider buying me
+          a coffee :)
         </p>
       </div>
       <div class="support-actions">

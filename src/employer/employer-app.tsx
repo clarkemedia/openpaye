@@ -7,7 +7,9 @@ import { applyTheme, type SeedId, type ThemeMode } from '../lib/theme';
 import { loadPref, savePref } from '../lib/state';
 import { ButtonGroup, Icon, IconButton, NumberField, Switch, useAnimatedNumber } from '../components/ui';
 import { SplitBar } from '../components/charts';
-import { Brand, SiteFooter } from '../components/site';
+import { Brand, SiteFooter, SiteNav } from '../components/site';
+import { SupportCard } from '../components/support';
+import { SITE } from '../config/site';
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -47,11 +49,15 @@ export function EmployerApp() {
   const nextMode: Record<ThemeMode, ThemeMode> = { system: 'light', light: 'dark', dark: 'system' };
   const modeIcon = { system: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' } as const;
 
+  const yearGroup = (
+    <ButtonGroup label="Tax year" class="year-group" value={year} onChange={setYear} options={YEAR_LIST.map((y) => ({ value: y, label: String(y) }))} />
+  );
+
   return (
     <>
-      <header class="topbar">
+      <header class={`topbar ${SITE.pages ? 'with-nav' : ''}`}>
         <Brand base="../" />
-        <ButtonGroup label="Tax year" class="year-group" value={year} onChange={setYear} options={YEAR_LIST.map((y) => ({ value: y, label: String(y) }))} />
+        {SITE.pages ? <SiteNav base="../" current="employer-cost/" /> : yearGroup}
         <div class="topbar-actions">
           <IconButton icon={modeIcon[mode]} label="Change theme" onClick={() => setMode(nextMode[mode])} />
         </div>
@@ -72,7 +78,10 @@ export function EmployerApp() {
         <div class="calc">
           <div class="calc-salary">
             <section class="card salary-card">
-              <h2 class="card-title">Employee's gross salary</h2>
+              <div class="salary-head">
+                <h2 class="card-title">Employee's gross salary</h2>
+                {SITE.pages && yearGroup}
+              </div>
               <NumberField size="xl" label="Salary before tax" prefix="€" suffix="per year" value={gross} step={1000} onChange={setGross} />
             </section>
           </div>
@@ -203,6 +212,7 @@ export function EmployerApp() {
             to 6% by year ten.
           </p>
         </section>
+        <SupportCard />
       </main>
       <SiteFooter base="../" />
     </>

@@ -5,8 +5,9 @@ import { applyTheme, SEEDS, type SeedId, type ThemeMode } from './lib/theme';
 import { decodeInputs, encodeInputs, loadPref, savePref, shareUrl } from './lib/state';
 import { eurWhole } from './lib/format';
 import { Button, ButtonGroup, Icon, IconButton, Snackbar } from './components/ui';
-import { Brand, DonateButton, SiteFooter } from './components/site';
-import { ExploreChips } from './components/support';
+import { Brand, DonateButton, SiteFooter, SiteNav } from './components/site';
+import { ExploreChips, SupportCard } from './components/support';
+import { SITE } from './config/site';
 import { OptionsPanel, SalaryCard } from './components/options';
 import { Breakdown, Hero, PeriodTable, StickyResult, type HeroView } from './components/results';
 import { AutoEnrolmentCard, BonusCard, BudgetCompare, CurveCard, HouseholdCard, MissingCredits, NextHundred, SharesCard, TaxFreedom, VsMedian, WhatIf } from './components/insights';
@@ -23,6 +24,8 @@ const FRAMED = (() => {
 
 /** The offline single-file build has no other pages to link to */
 const STANDALONE = import.meta.env.MODE === 'single';
+// The website build has a main menu in the header, so the year switcher moves to the salary card
+const MENU = SITE.pages && !FRAMED;
 
 const initialInputs = (): Inputs =>
   (typeof location !== 'undefined' && decodeInputs(location.hash)) || loadPref<Inputs>('inputs', DEFAULT_INPUTS);
@@ -97,21 +100,25 @@ export function App() {
 
   const cfg = YEARS[inputs.year];
 
+  const yearGroup = (
+    <ButtonGroup
+      label="Tax year"
+      class="year-group"
+      value={inputs.year}
+      onChange={(year: TaxYear) => set({ year })}
+      options={YEAR_LIST.map((y) => ({
+        value: y,
+        label: String(y),
+        title: YEARS[y].note,
+      }))}
+    />
+  );
+
   return (
     <>
-      <header class="topbar">
+      <header class={`topbar ${MENU ? 'with-nav' : ''}`}>
         <Brand />
-        <ButtonGroup
-          label="Tax year"
-          class="year-group"
-          value={inputs.year}
-          onChange={(year: TaxYear) => set({ year })}
-          options={YEAR_LIST.map((y) => ({
-            value: y,
-            label: String(y),
-            title: YEARS[y].note,
-          }))}
-        />
+        {MENU ? <SiteNav /> : yearGroup}
         <div class="topbar-actions">
           <div class="palette-wrap">
             <IconButton icon="palette" label="Colour" onClick={() => setPaletteOpen(!paletteOpen)} selected={paletteOpen} />
@@ -152,7 +159,7 @@ export function App() {
             Ireland's salary after tax calculator. Income Tax, USC and PRSI for {YEAR_LIST.join(', ')}, including Budget 2027. Free, private, and
             open source. Nothing you type leaves your device.
           </p>
-          {!STANDALONE && <ExploreChips />}
+          {!STANDALONE && !MENU && <ExploreChips />}
         </div>
 
         {cfg.status === 'announced' && (
@@ -166,7 +173,7 @@ export function App() {
 
         <div class="calc">
           <div class="calc-salary">
-            <SalaryCard inputs={inputs} set={set} />
+            <SalaryCard inputs={inputs} set={set} aside={MENU ? yearGroup : undefined} />
           </div>
           <div class="calc-results">
             <Hero r={r} regular={regular} inputs={inputs} set={set} display={display} setDisplay={setDisplay} view={view} setView={setView} />
@@ -211,7 +218,7 @@ export function App() {
         </div>
 
         <Breakdown r={r} />
-
+        {!FRAMED && <SupportCard />}
 
         <About />
       </main>

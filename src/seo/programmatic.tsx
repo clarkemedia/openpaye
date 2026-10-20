@@ -4,7 +4,6 @@ import { encodeInputs } from '../lib/state';
 import { eurCents, eurWhole, pct, signedEur } from '../lib/format';
 import { Breakdown, segmentsFor } from '../components/results';
 import { SplitBar } from '../components/charts';
-import { SupportCard } from '../components/support';
 import { CtaBand, DataTable, Faq, LinkGrid, PageHero, PageShell, Section, Sources, Tiles, type QA } from './kit';
 import { FULL_TIME_HOURS, HOURLY, hourlyPath, nearest, neighbours, SALARIES, salaryPath, TAKE_HOME, takeHomePath } from './data';
 
@@ -159,7 +158,6 @@ export function salaryPage(gross: number): PageOut {
         <Section icon="payments" title="Nearby salaries">
           <LinkGrid base={base} links={[...nb, ...jumps].sort((a, b) => a - b).map((v) => ({ path: salaryPath(v), label: eurWhole(v), sub: `${m(calc(CURRENT, v).net)}/mo` }))} />
         </Section>
-        <SupportCard />
         <Sources updated={updatedLabel()} />
       </PageShell>
     ),
