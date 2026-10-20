@@ -11,7 +11,7 @@ jobs:
   submit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: git fetch --depth=1 origin site
       - name: Check the live site is up to date
         run: |
@@ -37,7 +37,15 @@ jobs:
           echo "Submitting $(jq '.urlList | length' body.json) pages"
           STATUS=$(curl -sS -o response.txt -w '%{http_code}' -X POST https://api.indexnow.org/indexnow \
             -H 'Content-Type: application/json; charset=utf-8' --data @body.json)
-          cat response.txt
+          cat response.txt; echo
           echo "IndexNow replied $STATUS"
           # 200 = accepted, 202 = accepted while the key is being checked
-          [ "$STATUS" = 200 ] || [ "$STATUS" = 202 ]
+          if [ "$STATUS" = 200 ] || [ "$STATUS" = 202 ]; then
+            echo "::notice::IndexNow accepted $(jq '.urlList | length' body.json) pages"
+          elif grep -q SiteVerificationNotCompleted response.txt; then
+            echo "::error::IndexNow is still checking the key file (normal the first time). Wait 10 minutes and run this again."
+            exit 1
+          else
+            echo "::error::IndexNow refused the submission (HTTP $STATUS). See the reply above."
+            exit 1
+          fi
