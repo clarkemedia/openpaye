@@ -4,12 +4,13 @@
   "description": "Open-source Irish salary after tax calculator: Income Tax, USC and PRSI for 2025, 2026 and Budget 2027",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build -c vite.widget.config.ts && npm run prerender",
+    "build": "vite build && vite build -c vite.widget.config.ts",
+    "build:site": "vite build --mode site && vite build -c vite.widget.config.ts --mode site && npm run prerender",
     "build:single": "vite build --mode single",
     "preview": "vite preview --port 4173",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "prerender": "vite-node --mode production --options.deps.inline=@material/material-color-utilities scripts/prerender.tsx"
+    "prerender": "vite-node --mode site --options.deps.inline=@material/material-color-utilities scripts/prerender.tsx"
   },
   "license": "MIT",
   "dependencies": {

@@ -10,10 +10,11 @@
 
 | Branch | What it's for |
 |---|---|
-| `main` | **Self-hosted.** The calculator, the employer cost calculator, the embeddable widget, Docker and a single-file build. |
-| `web` | **Website.** Everything in `main`, plus about 660 pre-rendered search-friendly pages (every salary, hourly rate and net-to-gross amount, Budget 2027 and tax guides), a sitemap, canonical URLs and structured data. |
+| `source` | **All the code.** Work and pull requests go here. |
+| `self-host` | **Built self-hosted version**, made automatically from `source` and served by GitHub Pages. The calculator, the employer cost calculator and the embeddable widget. |
+| `site` | **Built website** for openpaye.ie, made automatically from `source`. Everything in `self-host`, plus about 660 pre-rendered search-friendly pages (every salary, hourly rate and net-to-gross amount, Budget 2027 and tax guides), a sitemap, canonical URLs and structured data. |
 
-`web` is `main` plus one layer of website files. Merge `main` into `web` to bring it up to date.
+Only edit `source`. The other two branches are rebuilt on every push, so changes made there are lost.
 
 ## Features
 
@@ -62,6 +63,7 @@ Other commands:
 npm run dev           # development server with hot reload: http://localhost:5173
 npm test              # tax engine tests (hand-worked examples)
 npm run build:single  # calculator only, as one self-contained file: dist-single/index.html
+npm run build:site    # the full website with the search pages (settings in .env.site)
 ```
 
 ## Self-host
@@ -74,9 +76,11 @@ docker compose up -d   # http://localhost:8080
 
 The image runs the tests, builds the app and serves it with nginx. It uses a strict Content Security Policy and makes no external requests.
 
-**GitHub Pages.** Every push to `main` builds the app and publishes it to the `gh-pages` branch (see `.github/workflows/pages.yml`). In a fork, turn it on under **Settings → Pages → Deploy from a branch → `gh-pages` / root**. The live copy is at https://clarkemedia.github.io/openpaye/.
+**GitHub Pages.** Every push to `source` builds the app and publishes it to the `self-host` branch (see `.github/workflows/pages.yml`). In a fork, turn it on under **Settings → Pages → Deploy from a branch → `self-host` / root**. The live copy is at https://clarkemedia.github.io/openpaye/.
 
-**Any static host.** Upload `dist/` to Netlify, Cloudflare Pages, GitHub Pages, S3 or a plain web server. If your host sets a CSP, allow `/embed.html` to be framed by other sites (`frame-ancestors *`), as `nginx.conf` does.
+**Any static host.** Upload `dist/` to Netlify, Cloudflare Pages, GitHub Pages, S3 or a plain web server. If your host sets a CSP, allow `/embed.html` to be framed by other sites (`frame-ancestors *`), as `nginx.conf` does. On Apache hosts (Cloudways, cPanel and most shared hosting), copy [`deploy/apache/.htaccess`](deploy/apache/.htaccess) next to `index.html` for the same rules.
+
+**Pull from Git.** Hosts that deploy from a Git branch without building (such as Cloudways) can pull the `self-host` or `site` branch, which already contain the finished files.
 
 **No server at all.** Run `npm run build:single`, then open or share `dist-single/index.html`. It works offline.
 
@@ -86,7 +90,7 @@ Copy `.env.example` to `.env`, or pass these as Docker build arguments:
 
 | Setting | Effect |
 |---|---|
-| `VITE_SITE_URL` | Your site's address (used for canonical links on the `web` branch) |
+| `VITE_SITE_URL` | Your site's address (used for canonical links in the website build) |
 | `VITE_REPO_URL` | Shows a "Source code" link in the footer |
 | `VITE_DONATE_URL` | Shows a "Buy me a coffee" link (PayPal.me, Ko-fi, GitHub Sponsors…) |
 

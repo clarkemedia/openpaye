@@ -5,7 +5,7 @@
  *   VITE_SITE_URL=https://example.ie            Canonical URL (used by the website build)
  *   VITE_REPO_URL=https://github.com/you/openpaye  Footer "Source code" link
  *   VITE_DONATE_URL=https://paypal.me/you       Optional support link (PayPal, Ko-fi, GitHub Sponsors…)
- *   VITE_SITE_PAGES=1                           Set by the `web` branch, which adds the guide and salary pages
+ *   VITE_SITE_PAGES=1                           Set by `npm run build:site` (.env.site), which adds the guide and salary pages
  */
 import pkg from '../../package.json';
 

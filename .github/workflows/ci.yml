@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches: [source]
   pull_request:
 jobs:
   test-and-build:
@@ -16,6 +16,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - run: npm run build:site
       - run: npm run build:single
       - uses: actions/upload-artifact@v4
         with:

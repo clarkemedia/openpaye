@@ -2,7 +2,7 @@
  * Pre-renders the static, search-friendly pages into dist/ after `vite build`.
  * Run with: npx vite-node scripts/prerender.tsx
  */
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import renderToString from 'preact-render-to-string';
 import { SITE } from '../src/config/site';
@@ -185,5 +185,6 @@ writeFileSync(
 );
 writeFileSync(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /embed.html\n\nSitemap: ${SITE.url}/sitemap.xml\n`);
 
-if (!existsSync(join(DIST, 'og.png'))) console.warn('warning: dist/og.png missing (add public/og.png)');
+// The share image is only needed by the website build, so it lives here rather than in public/
+copyFileSync(join(process.cwd(), 'src/seo/og.png'), join(DIST, 'og.png'));
 console.log(`prerendered ${pages.length} pages + 2 apps in ${Date.now() - t0} ms · sitemap has ${urls.length} URLs`);
