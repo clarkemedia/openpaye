@@ -205,11 +205,21 @@ export function NumberField(props: {
           }}
           onInput={(e) => {
             const el = e.currentTarget as HTMLInputElement;
-            const raw = el.value;
+            const kind = (e as InputEvent).inputType ?? '';
+            let raw = el.value;
+            let caret = el.selectionStart ?? raw.length;
+            // Deleting only a comma would just bring it back, so delete the digit next to it instead
+            if (kind.startsWith('delete') && raw.replace(/,/g, '') === text.replace(/,/g, '')) {
+              const i = kind === 'deleteContentForward' ? caret : caret - 1;
+              if (i >= 0 && i < raw.length) {
+                raw = raw.slice(0, i) + raw.slice(i + 1);
+                caret = i;
+              }
+            }
             const t = regroup(raw);
-            if (t !== raw) {
+            if (t !== el.value) {
               // Keep the caret after the same digit it followed before regrouping
-              const before = [...raw.slice(0, el.selectionStart ?? raw.length)].filter(isNumChar).length;
+              const before = [...raw.slice(0, caret)].filter(isNumChar).length;
               let pos = 0;
               for (let seen = 0; pos < t.length && seen < before; pos++) if (isNumChar(t[pos])) seen++;
               el.value = t;
