@@ -2,6 +2,7 @@
  * Pre-renders the static, search-friendly pages into dist/ after `vite build`.
  * Run with: npx vite-node scripts/prerender.tsx
  */
+import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import renderToString from 'preact-render-to-string';
@@ -12,7 +13,9 @@ import { EmployerApp } from '../src/employer/employer-app';
 import { abs, ldBreadcrumbs, ldFaq, ldWebApp } from '../src/seo/kit';
 import { SALARIES, HOURLY, TAKE_HOME } from '../src/seo/data';
 import { hourlyHub, hourlyPage, salaryHub, salaryPage, takeHomeHub, takeHomePage, type PageOut } from '../src/seo/programmatic';
-import { budgetPage, guidePages, guidesHub, notFoundPage, widgetPage } from '../src/seo/editorial';
+import { budgetPage, GUIDES, guidePages, guidesHub, notFoundPage, widgetPage } from '../src/seo/editorial';
+import { calculate, DEFAULT_INPUTS } from '../src/tax/engine';
+import { YEARS } from '../src/tax/years';
 
 const DIST = join(process.cwd(), 'dist');
 const manifest = JSON.parse(readFileSync(join(DIST, '.vite/manifest.json'), 'utf8'));
@@ -26,7 +29,10 @@ const mainCss: string[] = [...new Set(cssFor('index.html'))];
 const today = new Date().toISOString().slice(0, 10);
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const ld = (o: object) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`;
-const FAVICON = readFileSync(join(process.cwd(), 'index.html'), 'utf8').match(/<link rel="icon"[^>]+>/)![0];
+const icons = (base: string) => `<link rel="icon" href="${base}favicon.ico" sizes="48x48" />
+<link rel="icon" href="${base}favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="${base}apple-touch-icon.png" />
+<link rel="manifest" href="${base}site.webmanifest" />`;
 
 /* Shared assets ---------------------------------------------------- */
 
@@ -73,7 +79,7 @@ ${o.noindex ? '<meta name="robots" content="noindex" />' : `<link rel="canonical
 <meta property="og:image" content="${SITE.url}/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="theme-color" content="#f6fbf3" />
-${FAVICON}
+${icons(o.base)}
 <script src="${o.base}theme-boot.js"></script>
 ${mainCss.map((c) => `<link rel="stylesheet" href="${o.base}${c}" />`).join('\n')}
 <link rel="stylesheet" href="${o.base}theme.css" />
@@ -172,18 +178,93 @@ pages.forEach(writePage);
 
 /* Sitemap & robots --------------------------------------------------- */
 
+// lastmod is when a page's content last changed (from git), not the build date, so search engines can trust it
+function changed(paths: string[]) {
+  try {
+    return execFileSync('git', ['log', '-1', '--format=%cs', '--', ...paths], { encoding: 'utf8' }).trim() || today;
+  } catch {
+    return today;
+  }
+}
+const RATES = ['src/tax'];
+const appDate = changed([...RATES, 'src/app.tsx', 'src/components', 'src/employer']);
+const listDate = changed([...RATES, 'src/seo/programmatic.tsx', 'src/seo/data.ts', 'src/seo/kit.tsx']);
+const guideDate = changed([...RATES, 'src/seo/editorial.tsx', 'src/seo/kit.tsx']);
+const isList = (path: string) => /^\/(salary|hourly|take-home)\//.test(path);
+
 const urls = [
-  { loc: abs('/'), priority: 1 },
-  { loc: abs('/employer-cost/'), priority: 0.8 },
-  ...pages.filter((p) => !p.path.endsWith('.html')).map((p) => ({ loc: abs(p.path), priority: p.priority ?? 0.5 })),
+  { loc: abs('/'), priority: 1, lastmod: appDate },
+  { loc: abs('/employer-cost/'), priority: 0.8, lastmod: appDate },
+  ...pages
+    .filter((p) => !p.path.endsWith('.html'))
+    .map((p) => ({ loc: abs(p.path), priority: p.priority ?? 0.5, lastmod: isList(p.path) ? listDate : guideDate })),
 ];
 writeFileSync(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
-    .map((u) => `  <url><loc>${u.loc}</loc><lastmod>${today}</lastmod><priority>${u.priority.toFixed(1)}</priority></url>`)
+    .map((u) => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod><priority>${u.priority.toFixed(1)}</priority></url>`)
     .join('\n')}\n</urlset>\n`,
 );
 writeFileSync(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /embed.html\n\nSitemap: ${SITE.url}/sitemap.xml\n`);
+
+/* llms.txt: a plain-text guide to the site for AI assistants (llmstxt.org) -------- */
+
+const eur = (n: number) => `€${Math.round(n).toLocaleString('en-IE')}`;
+const pc = (n: number) => `${+(n * 100).toFixed(2)}%`;
+const yearFacts = (y: 2026 | 2027) => {
+  const c = YEARS[y];
+  const net = calculate({ ...DEFAULT_INPUTS, year: y, amount: 50000 }).net;
+  return [
+    `- ${y}${c.status === 'announced' ? ' (Budget 2027, announced 6 October 2026)' : ''}: Income Tax 20% up to ${eur(c.incomeTax.bands.single)} (single), 40% above. Personal and PAYE credits ${eur(c.credits.personalSingle)} each.`,
+    `  USC ${c.usc.bands.map((b) => pc(b.rate)).join(' / ')} (bands to ${c.usc.bands.slice(0, -1).map((b) => eur(b.upTo)).join(', ')}); no USC on income of ${eur(c.usc.exemptionThreshold)} or less.`,
+    `  PRSI Class A ${c.prsi.periods.map((p) => `${pc(p.rate)} from ${p.from}`).join(', ')}. A single person on €50,000 takes home ${eur(net)} a year (${eur(net / 12)} a month).`,
+  ].join('\n');
+};
+writeFileSync(
+  join(DIST, 'llms.txt'),
+  `# OpenPAYE
+
+> Free, open-source salary after tax calculator for Ireland. It works out Income Tax, USC and PRSI for 2025, 2026 and Budget 2027 and shows every step of the maths. Everything runs in the browser: no cookies, no tracking, no sign-up.
+
+Figures are estimates for PAYE employees. A real payslip depends on the person's Revenue tax credit certificate and when in the year they started. Rates come from Revenue, the Department of Finance and the Department of Social Protection. Not affiliated with Revenue or the Government of Ireland.
+
+## Calculators
+
+- [Salary after tax calculator](${abs('/')}): gross to take-home by year, month, fortnight, week, day and hour, with pensions, AVCs, auto-enrolment, bonuses, company shares, benefits-in-kind, tax credits, public sector ASC and household (joint assessment) options. Inputs are kept in the page address, so a link opens the exact calculation.
+- [Employer cost calculator](${abs('/employer-cost/')}): employer PRSI, auto-enrolment matching and pension on top of salary.
+
+## Salary tables
+
+- [Salaries after tax](${abs('/salary/')}): one page per salary from ${eur(SALARIES[0])} to ${eur(SALARIES[SALARIES.length - 1])}, for example [€50,000 after tax](${abs('/salary/50000/')}).
+- [Hourly wage after tax](${abs('/hourly/')}): take-home for common hourly rates, including the minimum wage.
+- [Net to gross](${abs('/take-home/')}): the gross salary needed for a given monthly take-home.
+
+## Guides
+
+- [Budget 2027](${abs('/budget-2027/')}): what changed and what it means for take-home pay.
+${GUIDES.map((g) => `- [${g.label}](${abs(`/guides/${g.slug}/`)}): ${g.sub}.`).join('\n')}
+
+## Key rates
+
+${yearFacts(2026)}
+${yearFacts(2027)}
+
+## Optional
+
+- [Widget and API](${abs('/widget/')}): show take-home pay next to salaries on other websites.${SITE.repoUrl ? `\n- [Source code](${SITE.repoUrl}): MIT licence. All rates live in src/tax/years.ts.` : ''}
+`,
+);
+
+/* security.txt (RFC 9116) ---------------------------------------------- */
+
+if (SITE.repoUrl) {
+  const expires = new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+  mkdirSync(join(DIST, '.well-known'), { recursive: true });
+  writeFileSync(
+    join(DIST, '.well-known/security.txt'),
+    `Contact: ${SITE.repoUrl}/security/advisories/new\nExpires: ${expires}\nPreferred-Languages: en\nCanonical: ${SITE.url}/.well-known/security.txt\n`,
+  );
+}
 
 // The share image is only needed by the website build, so it lives here rather than in public/
 copyFileSync(join(process.cwd(), 'src/seo/og.png'), join(DIST, 'og.png'));

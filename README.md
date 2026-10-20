@@ -28,7 +28,7 @@ Only edit `source`. The other two branches are rebuilt on every push, so changes
 | **Bonus planner** | Overtime and bonus, a slider to pay part of the bonus into your pension, a cash vs pension comparison, and an option to keep a lump-sum bonus out of your monthly figure |
 | **Company shares** | ESPP, Approved Profit Sharing Scheme (APSS) and RSUs with sell-to-cover |
 | **Benefits-in-kind** | Health insurance with medical insurance relief, company cars (A1 to E, business kilometres, OMV reductions), employer loans and other benefits |
-| **Credits and reliefs** | Rent Tax Credit, Mortgage Interest Tax Credit (2025–26), flat rate expenses, remote working relief, Blind Person, Dependent Relative, Incapacitated Child, Age credit and the 65+ exemption, reduced USC (70+ or medical card), and credits from your certificate |
+| **Credits and reliefs** | Rent Tax Credit, Mortgage Interest Tax Credit (2025–26), flat rate expenses, TaxSaver commuter tickets, remote working relief, Blind Person, Dependent Relative, Incapacitated Child, Age credit and the 65+ exemption, reduced USC (70+ or medical card), and credits from your certificate |
 | **Public sector** | Additional Superannuation Contribution (pre-2013, fast accrual and Single Scheme) and PRSI Class D |
 | **Other income** | Self-employed profit (Class S PRSI, Earned Income credit, USC surcharge), rental income, rent-a-room relief, investment income and the State pension |
 | **Payslip mode** | Uses the PRSI rate in force now instead of the yearly average |

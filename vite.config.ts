@@ -1,12 +1,23 @@
 import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
+import { readFileSync } from 'node:fs';
+
+// The single-file build can't load icon files, so it gets the logo inline instead
+const inlineIcon = {
+  name: 'inline-icon',
+  transformIndexHtml(html: string) {
+    const svg = readFileSync('public/favicon.svg', 'utf8').trim();
+    const icon = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(svg)}" />`;
+    return html.replace(/<link rel="(icon|apple-touch-icon|manifest)"[^>]*>\s*/g, '').replace('</head>', `    ${icon}\n  </head>`);
+  },
+};
 
 // `npm run build`         → dist/ (static site, deploy anywhere)
 // `npm run build:single`  → dist-single/index.html (one self-contained file)
 export default defineConfig(({ mode }) => ({
   base: './',
-  plugins: [preact(), ...(mode === 'single' ? [viteSingleFile()] : [])],
+  plugins: [preact(), ...(mode === 'single' ? [viteSingleFile(), inlineIcon] : [])],
   build: {
     outDir: mode === 'single' ? 'dist-single' : 'dist',
     manifest: mode !== 'single',

@@ -4,6 +4,8 @@
 Options -Indexes
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
+AddDefaultCharset UTF-8
+AddCharset UTF-8 .webmanifest .svg
 
 # Use the bare domain: www.example.ie → example.ie
 <IfModule mod_rewrite.c>

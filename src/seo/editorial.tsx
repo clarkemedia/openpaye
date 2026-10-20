@@ -104,7 +104,7 @@ export function budgetPage(): PageOut {
 /* Guides                                                             */
 /* ================================================================== */
 
-const GUIDES = [
+export const GUIDES = [
   { slug: 'tax-bands', label: 'Income tax bands', sub: 'Standard rate cut-off points' },
   { slug: 'tax-credits', label: 'Tax credits', sub: 'Personal, PAYE, rent and more' },
   { slug: 'usc', label: 'USC rates', sub: 'Universal Social Charge bands' },

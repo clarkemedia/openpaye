@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **TaxSaver commuter tickets.** A bus, rail or Luas ticket bought through salary sacrifice, with no Income Tax, USC or PRSI on that part of your pay.
+- **Number fields** add thousands separators as you type (thanks to [Shane O'Sullivan](https://github.com/shaneosullivan)), and Delete and Backspace step over the commas.
+- **Website:** the main menu is on every page, and the year switcher sits beside your salary. A short "Keeping OpenPAYE free" note at the end of each page.
+- **Icons and search:** proper favicons, a home screen icon and web app manifest, `llms.txt`, `security.txt`, and sitemap dates that only change when a page's content does.
+- **Branches:** `source` holds all the code. `self-host` and `site` are built from it automatically. Apache hosts get the same privacy headers as nginx through `deploy/apache/.htaccess`.
+
 ## 1.1 (October 2026)
 
 Built from beta feedback on Reddit. Thanks to everyone who tried it and told us what was missing.
