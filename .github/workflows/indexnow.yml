@@ -1,0 +1,43 @@
+# Tells IndexNow search engines (Bing, Yandex, Seznam, Naver, Yep) about every page on the website.
+# Run it by hand (Actions → Submit to IndexNow → Run workflow) after the web host has pulled the
+# latest site branch. It checks the live site matches the site branch first, so crawlers never
+# get pointed at an old version.
+name: Submit to IndexNow
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git fetch --depth=1 origin site
+      - name: Check the live site is up to date
+        run: |
+          KEY=$(grep '^VITE_INDEXNOW_KEY=' .env.site | cut -d= -f2)
+          SITE=$(grep '^VITE_SITE_URL=' .env.site | cut -d= -f2)
+          echo "KEY=$KEY" >> "$GITHUB_ENV"
+          echo "SITE=$SITE" >> "$GITHUB_ENV"
+          if [ "$(curl -fsS "$SITE/$KEY.txt")" != "$KEY" ]; then
+            echo "::error::$SITE/$KEY.txt isn't live yet. Pull the site branch on your web host, then run this again."
+            exit 1
+          fi
+          curl -fsS "$SITE/sitemap.xml" -o live-sitemap.xml
+          if ! git show origin/site:sitemap.xml | cmp -s - live-sitemap.xml; then
+            echo "::error::The live sitemap doesn't match the site branch. Pull the site branch on your web host (and clear its cache), then run this again."
+            exit 1
+          fi
+      - name: Submit every page in the sitemap
+        run: |
+          HOST=${SITE#https://}
+          grep -o '<loc>[^<]*' live-sitemap.xml | sed 's/<loc>//' | jq -R . | jq -s \
+            --arg host "$HOST" --arg key "$KEY" --arg loc "$SITE/$KEY.txt" \
+            '{host: $host, key: $key, keyLocation: $loc, urlList: .}' > body.json
+          echo "Submitting $(jq '.urlList | length' body.json) pages"
+          STATUS=$(curl -sS -o response.txt -w '%{http_code}' -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' --data @body.json)
+          cat response.txt
+          echo "IndexNow replied $STATUS"
+          # 200 = accepted, 202 = accepted while the key is being checked
+          [ "$STATUS" = 200 ] || [ "$STATUS" = 202 ]

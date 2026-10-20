@@ -268,6 +268,9 @@ if (SITE.repoUrl) {
   writeFileSync(join(DIST, 'security.txt'), body);
 }
 
+// IndexNow: the key file proves we own the site when submitting pages (see .github/workflows/indexnow.yml)
+if (SITE.indexNowKey) writeFileSync(join(DIST, `${SITE.indexNowKey}.txt`), SITE.indexNowKey);
+
 // The share image is only needed by the website build, so it lives here rather than in public/
 copyFileSync(join(process.cwd(), 'src/seo/og.png'), join(DIST, 'og.png'));
 console.log(`prerendered ${pages.length} pages + 2 apps in ${Date.now() - t0} ms · sitemap has ${urls.length} URLs`);

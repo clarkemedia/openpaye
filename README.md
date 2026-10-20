@@ -82,6 +82,8 @@ The image runs the tests, builds the app and serves it with nginx. It uses a str
 
 **Pull from Git.** Hosts that deploy from a Git branch without building (such as Cloudways) can pull the `self-host` or `site` branch, which already contain the finished files.
 
+**IndexNow.** After the web host has pulled a new `site` build, run **Actions → Submit to IndexNow → Run workflow** to tell Bing and other IndexNow search engines about every page. It checks the live site is up to date first. The key is `VITE_INDEXNOW_KEY` in `.env.site`.
+
 **No server at all.** Run `npm run build:single`, then open or share `dist-single/index.html`. It works offline.
 
 ### Optional settings
