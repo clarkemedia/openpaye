@@ -1,0 +1,40 @@
+# OpenPAYE
+
+> Free, open-source salary after tax calculator for Ireland. It works out Income Tax, USC and PRSI for 2025, 2026 and Budget 2027 and shows every step of the maths. Everything runs in the browser: no cookies, no tracking, no sign-up.
+
+Figures are estimates for PAYE employees. A real payslip depends on the person's Revenue tax credit certificate and when in the year they started. Rates come from Revenue, the Department of Finance and the Department of Social Protection. Not affiliated with Revenue or the Government of Ireland.
+
+## Calculators
+
+- [Salary after tax calculator](https://openpaye.ie/): gross to take-home by year, month, fortnight, week, day and hour, with pensions, AVCs, auto-enrolment, bonuses, company shares, benefits-in-kind, tax credits, public sector ASC and household (joint assessment) options. Inputs are kept in the page address, so a link opens the exact calculation.
+- [Employer cost calculator](https://openpaye.ie/employer-cost/): employer PRSI, auto-enrolment matching and pension on top of salary.
+
+## Salary tables
+
+- [Salaries after tax](https://openpaye.ie/salary/): one page per salary from €10,000 to €500,000, for example [€50,000 after tax](https://openpaye.ie/salary/50000/).
+- [Hourly wage after tax](https://openpaye.ie/hourly/): take-home for common hourly rates, including the minimum wage.
+- [Net to gross](https://openpaye.ie/take-home/): the gross salary needed for a given monthly take-home.
+
+## Guides
+
+- [Budget 2027](https://openpaye.ie/budget-2027/): what changed and what it means for take-home pay.
+- [Income tax bands](https://openpaye.ie/guides/tax-bands/): Standard rate cut-off points.
+- [Tax credits](https://openpaye.ie/guides/tax-credits/): Personal, PAYE, rent and more.
+- [USC rates](https://openpaye.ie/guides/usc/): Universal Social Charge bands.
+- [PRSI rates](https://openpaye.ie/guides/prsi/): Employee and employer.
+- [Auto-enrolment](https://openpaye.ie/guides/auto-enrolment/): My Future Fund contributions.
+- [Minimum wage](https://openpaye.ie/guides/minimum-wage/): Hourly rates and take-home.
+
+## Key rates
+
+- 2026: Income Tax 20% up to €44,000 (single), 40% above. Personal and PAYE credits €2,000 each.
+  USC 0.5% / 2% / 3% / 8% (bands to €12,012, €28,700, €70,044); no USC on income of €13,000 or less.
+  PRSI Class A 4.2% from 1 Jan, 4.35% from 1 Oct. A single person on €50,000 takes home €39,648 a year (€3,304 a month).
+- 2027 (Budget 2027, announced 6 October 2026): Income Tax 20% up to €46,500 (single), 40% above. Personal and PAYE credits €2,125 each.
+  USC 0.5% / 2% / 3% / 8% (bands to €12,012, €30,300, €70,044); no USC on income of €13,000 or less.
+  PRSI Class A 4.35% from 1 Jan, 4.5% from 1 Oct. A single person on €50,000 takes home €40,339 a year (€3,362 a month).
+
+## Optional
+
+- [Widget and API](https://openpaye.ie/widget/): show take-home pay next to salaries on other websites.
+- [Source code](https://github.com/clarkemedia/openpaye): MIT licence. All rates live in src/tax/years.ts.

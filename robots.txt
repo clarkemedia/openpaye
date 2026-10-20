@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /embed.html
+
+Sitemap: https://openpaye.ie/sitemap.xml

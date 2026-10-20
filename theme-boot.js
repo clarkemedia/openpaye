@@ -1,0 +1,1 @@
+try{var d=document.documentElement,m=JSON.parse(localStorage.getItem('openpaye:mode')||'"system"'),s=JSON.parse(localStorage.getItem('openpaye:seed')||'"shamrock"');if(m==='light'||m==='dark')d.setAttribute('data-theme',m);if(s&&s!=='shamrock')d.setAttribute('data-seed',s)}catch(e){}

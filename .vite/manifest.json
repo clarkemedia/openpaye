@@ -1,0 +1,95 @@
+{
+  "_charts-CFY9f5M_.css": {
+    "file": "assets/charts-CFY9f5M_.css",
+    "src": "_charts-CFY9f5M_.css"
+  },
+  "_charts-Db4OKSe9.js": {
+    "file": "assets/charts-Db4OKSe9.js",
+    "name": "charts",
+    "css": [
+      "assets/charts-CFY9f5M_.css"
+    ],
+    "assets": [
+      "assets/google-sans-flex-math-rond-normal-DpsmEeMy.woff2",
+      "assets/google-sans-flex-nushu-rond-normal-DBxP-v8_.woff2",
+      "assets/google-sans-flex-symbols-rond-normal-DeRU5Fbh.woff2",
+      "assets/google-sans-flex-syriac-rond-normal-Buowus-D.woff2",
+      "assets/google-sans-flex-vietnamese-rond-normal-Bym9Egtc.woff2",
+      "assets/google-sans-flex-latin-ext-rond-normal-CMQXxlmB.woff2",
+      "assets/google-sans-flex-latin-rond-normal-C35CNeuD.woff2"
+    ]
+  },
+  "_results-TiTRQOlq.js": {
+    "file": "assets/results-TiTRQOlq.js",
+    "name": "results",
+    "imports": [
+      "_charts-Db4OKSe9.js"
+    ]
+  },
+  "_support-CL2MDADz.js": {
+    "file": "assets/support-CL2MDADz.js",
+    "name": "support",
+    "imports": [
+      "_charts-Db4OKSe9.js"
+    ]
+  },
+  "embed.html": {
+    "file": "assets/embed-CdCijdVz.js",
+    "name": "embed",
+    "src": "embed.html",
+    "isEntry": true,
+    "imports": [
+      "_charts-Db4OKSe9.js",
+      "_results-TiTRQOlq.js"
+    ]
+  },
+  "employer-cost/index.html": {
+    "file": "assets/employer-xnM0OamU.js",
+    "name": "employer",
+    "src": "employer-cost/index.html",
+    "isEntry": true,
+    "imports": [
+      "_charts-Db4OKSe9.js",
+      "_support-CL2MDADz.js"
+    ]
+  },
+  "index.html": {
+    "file": "assets/main-DE9k8IOv.js",
+    "name": "main",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "_charts-Db4OKSe9.js",
+      "_support-CL2MDADz.js",
+      "_results-TiTRQOlq.js"
+    ]
+  },
+  "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-latin-ext-rond-normal.woff2": {
+    "file": "assets/google-sans-flex-latin-ext-rond-normal-CMQXxlmB.woff2",
+    "src": "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-latin-ext-rond-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-latin-rond-normal.woff2": {
+    "file": "assets/google-sans-flex-latin-rond-normal-C35CNeuD.woff2",
+    "src": "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-latin-rond-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-math-rond-normal.woff2": {
+    "file": "assets/google-sans-flex-math-rond-normal-DpsmEeMy.woff2",
+    "src": "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-math-rond-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-nushu-rond-normal.woff2": {
+    "file": "assets/google-sans-flex-nushu-rond-normal-DBxP-v8_.woff2",
+    "src": "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-nushu-rond-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-symbols-rond-normal.woff2": {
+    "file": "assets/google-sans-flex-symbols-rond-normal-DeRU5Fbh.woff2",
+    "src": "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-symbols-rond-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-syriac-rond-normal.woff2": {
+    "file": "assets/google-sans-flex-syriac-rond-normal-Buowus-D.woff2",
+    "src": "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-syriac-rond-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-vietnamese-rond-normal.woff2": {
+    "file": "assets/google-sans-flex-vietnamese-rond-normal-Bym9Egtc.woff2",
+    "src": "node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-vietnamese-rond-normal.woff2"
+  }
+}
