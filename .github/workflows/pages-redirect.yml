@@ -1,0 +1,32 @@
+# Publishes redirect pages to GitHub Pages, so old https://<owner>.github.io/<repo>/ links
+# open the same page on the live site. Needs Settings → Pages → Source: GitHub Actions.
+# Forks skip this: they can serve the self-host branch on their own Pages instead.
+name: Redirect GitHub Pages to the live site
+on:
+  push:
+    branches: [source]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    if: github.repository == 'clarkemedia/openpaye'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build redirect pages
+        run: scripts/pages-redirect.sh "$(grep '^VITE_SITE_URL=' .env.site | cut -d= -f2)" "${GITHUB_REPOSITORY#*/}" redirect
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: redirect
+      - id: deployment
+        uses: actions/deploy-pages@v4

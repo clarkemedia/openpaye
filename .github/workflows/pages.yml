@@ -1,5 +1,5 @@
 # Publishes the self-hosted build to the self-host branch on every push to source.
-# GitHub Pages serves that branch at https://<owner>.github.io/<repo>/
+# Forks can serve that branch with GitHub Pages at https://<owner>.github.io/<repo>/
 name: Deploy self-hosted build
 on:
   push:

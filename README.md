@@ -11,7 +11,7 @@
 | Branch | What it's for |
 |---|---|
 | `source` | **All the code.** Work and pull requests go here. |
-| `self-host` | **Built self-hosted version**, made automatically from `source` and served by GitHub Pages. The calculator, the employer cost calculator and the embeddable widget. |
+| `self-host` | **Built self-hosted version**, made automatically from `source`. The calculator, the employer cost calculator and the embeddable widget. |
 | `site` | **Built website** for openpaye.ie, made automatically from `source`. Everything in `self-host`, plus about 660 pre-rendered search-friendly pages (every salary, hourly rate and net-to-gross amount, Budget 2027 and tax guides), a sitemap, canonical URLs and structured data. |
 
 Only edit `source`. The other two branches are rebuilt on every push, so changes made there are lost.
@@ -76,7 +76,7 @@ docker compose up -d   # http://localhost:8080
 
 The image runs the tests, builds the app and serves it with nginx. It uses a strict Content Security Policy and makes no external requests.
 
-**GitHub Pages.** Every push to `source` builds the app and publishes it to the `self-host` branch (see `.github/workflows/pages.yml`). In a fork, turn it on under **Settings → Pages → Deploy from a branch → `self-host` / root**. The live copy is at https://clarkemedia.github.io/openpaye/.
+**GitHub Pages.** Every push to `source` builds the app and publishes it to the `self-host` branch (see `.github/workflows/pages.yml`). In a fork, turn it on under **Settings → Pages → Deploy from a branch → `self-host` / root**. This repository's own Pages address redirects to https://openpaye.ie (see `.github/workflows/pages-redirect.yml`).
 
 **Any static host.** Upload `dist/` to Netlify, Cloudflare Pages, GitHub Pages, S3 or a plain web server. If your host sets a CSP, allow `/embed.html` to be framed by other sites (`frame-ancestors *`), as `nginx.conf` does. On Apache hosts (Cloudways, cPanel and most shared hosting), copy [`deploy/apache/.htaccess`](deploy/apache/.htaccess) next to `index.html` for the same rules.
 
